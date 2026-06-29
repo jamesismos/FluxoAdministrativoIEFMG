@@ -146,7 +146,6 @@ export const Configuracoes: React.FC = () => {
             <textarea 
               value={importJsonText}
               onChange={e => setImportJsonText(e.target.value)}
-              placeholder="Cole o conteúdo do arquivo JSON de backup aqui..."
               className="w-full h-24 bg-slate-955 border border-slate-850 rounded p-2 font-mono text-[9px] focus:outline-none"
             />
             <button 

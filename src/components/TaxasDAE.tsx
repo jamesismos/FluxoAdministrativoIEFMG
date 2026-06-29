@@ -82,7 +82,6 @@ export const TaxasDAE: React.FC = () => {
                 type="text" 
                 value={numeroDAE}
                 onChange={e => setNumeroDAE(e.target.value)}
-                placeholder="Ex: 002.3456789.23"
                 className="w-full bg-slate-950 border border-slate-850 rounded px-2.5 py-1.5 text-white font-mono"
                 required
               />
@@ -133,7 +132,6 @@ export const TaxasDAE: React.FC = () => {
                   type="text" 
                   value={processoVinculado}
                   onChange={e => setProcessoVinculado(e.target.value)}
-                  placeholder="Número SEI"
                   className="w-full bg-slate-950 border border-slate-850 rounded px-2.5 py-1.5 text-white font-mono"
                 />
               </div>

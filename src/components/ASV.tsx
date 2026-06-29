@@ -106,7 +106,6 @@ export const ASV: React.FC = () => {
             <textarea 
               value={notes}
               onChange={e => setNotes(e.target.value)}
-              placeholder="Digite aqui as pendências das ASVs..."
               className="w-full h-72 bg-slate-950 border border-slate-800 rounded-lg p-3 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 font-sans text-xs resize-none"
             />
 

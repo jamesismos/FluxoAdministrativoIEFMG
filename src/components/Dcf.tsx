@@ -209,7 +209,6 @@ export const Dcf: React.FC<DcfProps> = ({ activeProcessId, onNavigate }) => {
                   type="text" 
                   value={produtoDeclarado}
                   onChange={e => setProdutoDeclarado(e.target.value)}
-                  placeholder="Ex: Eucalipto - Lenha / Madeira em tora"
                   className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-white"
                 />
               </div>

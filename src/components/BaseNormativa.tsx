@@ -72,23 +72,23 @@ export const BaseNormativa: React.FC = () => {
           <div className="space-y-3">
             <div>
               <label className="block text-slate-400 mb-1">Título da Norma *</label>
-              <input type="text" value={titulo} onChange={e => setTitulo(e.target.value)} placeholder="Ex: Resolução Conjunta SEMAD/IEF nº 3.102/2021" className="w-full bg-slate-950 border border-slate-850 rounded px-2.5 py-1.5 text-white" required />
+              <input type="text" value={titulo} onChange={e => setTitulo(e.target.value)} className="w-full bg-slate-950 border border-slate-850 rounded px-2.5 py-1.5 text-white" required />
             </div>
 
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <label className="block text-slate-400 mb-1">Resumo (Código/Lei)</label>
-                <input type="text" value={norma} onChange={e => setNorma(e.target.value)} placeholder="Ex: Resolução 3102" className="w-full bg-slate-950 border border-slate-850 rounded px-2.5 py-1.5 text-white" />
+                <input type="text" value={norma} onChange={e => setNorma(e.target.value)} className="w-full bg-slate-950 border border-slate-850 rounded px-2.5 py-1.5 text-white" />
               </div>
               <div>
                 <label className="block text-slate-400 mb-1">Artigo / Seção</label>
-                <input type="text" value={artigo} onChange={e => setArtigo(e.target.value)} placeholder="Ex: Art. 4º" className="w-full bg-slate-950 border border-slate-850 rounded px-2.5 py-1.5 text-white" />
+                <input type="text" value={artigo} onChange={e => setArtigo(e.target.value)} className="w-full bg-slate-950 border border-slate-850 rounded px-2.5 py-1.5 text-white" />
               </div>
             </div>
 
             <div>
               <label className="block text-slate-400 mb-1">Link de Acesso Externo</label>
-              <input type="url" value={link} onChange={e => setLink(e.target.value)} placeholder="http://..." className="w-full bg-slate-950 border border-slate-850 rounded px-2.5 py-1.5 text-white" />
+              <input type="url" value={link} onChange={e => setLink(e.target.value)} className="w-full bg-slate-950 border border-slate-850 rounded px-2.5 py-1.5 text-white" />
             </div>
           </div>
 
@@ -114,7 +114,6 @@ export const BaseNormativa: React.FC = () => {
           <Search className="text-slate-500 shrink-0" size={16} />
           <input
             type="text"
-            placeholder="Pesquisar leis, resoluções ou palavras-chave..."
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
             className="bg-transparent text-xs text-white focus:outline-none w-full"

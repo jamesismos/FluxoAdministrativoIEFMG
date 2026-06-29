@@ -103,7 +103,6 @@ export const EntradaTriagem: React.FC<EntradaTriagemProps> = ({ onNavigate }) =>
                   type="text" 
                   value={seiNumber}
                   onChange={e => setSeiNumber(e.target.value)}
-                  placeholder="Ex: 1370.01.0023456/2026-89"
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 font-mono"
                   required
                 />
@@ -134,7 +133,6 @@ export const EntradaTriagem: React.FC<EntradaTriagemProps> = ({ onNavigate }) =>
                   type="text" 
                   value={requerente}
                   onChange={e => setRequerente(e.target.value)}
-                  placeholder="Nome do produtor ou empresa"
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
                   required
                 />
@@ -146,7 +144,6 @@ export const EntradaTriagem: React.FC<EntradaTriagemProps> = ({ onNavigate }) =>
                   type="text" 
                   value={municipio}
                   onChange={e => setMunicipio(e.target.value)}
-                  placeholder="Digite o município"
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
                   list="municipios-suggestions"
                   required

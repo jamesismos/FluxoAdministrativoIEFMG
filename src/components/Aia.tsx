@@ -272,7 +272,6 @@ export const Aia: React.FC<AiaProps> = ({ activeProcessId, onNavigate }) => {
                       type="text" 
                       value={empreendimento}
                       onChange={e => setEmpreendimento(e.target.value)}
-                      placeholder="Nome da propriedade ou empreendimento"
                       className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500"
                     />
                   </div>
@@ -282,7 +281,6 @@ export const Aia: React.FC<AiaProps> = ({ activeProcessId, onNavigate }) => {
                       type="text"
                       value={responsavelTecnico}
                       onChange={e => setResponsavelTecnico(e.target.value)}
-                      placeholder="Nome do técnico responsável"
                       className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500"
                     />
                   </div>
@@ -316,7 +314,6 @@ export const Aia: React.FC<AiaProps> = ({ activeProcessId, onNavigate }) => {
             <textarea 
               value={documentosColados}
               onChange={e => setDocumentosColados(e.target.value)}
-              placeholder="Exemplo para colar:&#10;Requerimento de Intervenção (141254111)&#10;Identidade do Requerente (141254112)&#10;Planta Topográfica (141254115)&#10;Shapefile (.zip) (141254118)"
               className="w-full h-48 bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs text-slate-300 font-mono focus:outline-none focus:border-emerald-500"
             />
 
@@ -411,7 +408,6 @@ export const Aia: React.FC<AiaProps> = ({ activeProcessId, onNavigate }) => {
                         updated[idx].observacao = e.target.value;
                         setChecklist(updated);
                       }}
-                      placeholder="Observação..."
                       className="bg-slate-900 border border-slate-800 rounded px-2 py-1 text-white text-[10px] w-40 focus:outline-none"
                     />
                   </div>
@@ -529,7 +525,6 @@ export const Aia: React.FC<AiaProps> = ({ activeProcessId, onNavigate }) => {
                     type="text"
                     value={process.acompanhamentoTipo}
                     onChange={e => updateProcess(process.id, { acompanhamentoTipo: e.target.value })}
-                    placeholder="Ex: Intervenção Ambiental"
                     className="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1.5 text-white"
                   />
                 </div>
