@@ -42,3 +42,5 @@ next-env.d.ts
 
 # study manual
 MANUAL_ESTUDO.md
+
+.vercel
