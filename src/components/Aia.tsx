@@ -361,16 +361,13 @@ ${settings.nomeUnidade}`;
                   </div>
                   <div>
                     <label className="block text-xs text-slate-400 mb-1">Responsável Técnico Sugerido</label>
-                    <select
+                    <input 
+                      type="text"
                       value={responsavelTecnico}
                       onChange={e => setResponsavelTecnico(e.target.value)}
+                      placeholder="Nome do técnico responsável"
                       className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500"
-                    >
-                      <option value="">Selecione o técnico</option>
-                      {settings.responsaveisTecnicos.map(rt => (
-                        <option key={rt} value={rt}>{rt}</option>
-                      ))}
-                    </select>
+                    />
                   </div>
                   <div className="bg-slate-950/80 p-3 rounded-lg border border-slate-800 text-xs space-y-1 text-slate-300">
                     <p className="font-semibold text-white">Regras de Formalização IEF:</p>

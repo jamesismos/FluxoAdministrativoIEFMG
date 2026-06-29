@@ -15,13 +15,10 @@ export const Configuracoes: React.FC = () => {
   const [chefiaFuncao, setChefiaFuncao] = useState(settings.chefiaFuncao);
   const [chefiaObservacoesPadrao, setChefiaObservacoesPadrao] = useState(settings.chefiaObservacoesPadrao);
   
-  const [responsaveisTecnicosText, setResponsaveisTecnicosText] = useState(settings.responsaveisTecnicos.join(', '));
   const [importJsonText, setImportJsonText] = useState('');
 
   const handleSaveSettings = (e: React.FormEvent) => {
     e.preventDefault();
-
-    const techList = responsaveisTecnicosText.split(',').map(t => t.trim()).filter(Boolean);
 
     updateSettings({
       nomeUnidade,
@@ -29,8 +26,7 @@ export const Configuracoes: React.FC = () => {
       chefiaNome,
       chefiaUnidade,
       chefiaFuncao,
-      chefiaObservacoesPadrao,
-      responsaveisTecnicos: techList
+      chefiaObservacoesPadrao
     });
 
     alert('Configurações atualizadas localmente!');
@@ -118,10 +114,7 @@ export const Configuracoes: React.FC = () => {
               </div>
             </div>
 
-            <div className="border-t border-slate-850 pt-3">
-              <label className="block text-slate-400 mb-1">Responsáveis Técnicos e Analistas (Separados por vírgula)</label>
-              <input type="text" value={responsaveisTecnicosText} onChange={e => setResponsaveisTecnicosText(e.target.value)} className="w-full bg-slate-950 border border-slate-850 rounded px-2.5 py-1.5 text-white" />
-            </div>
+
 
             <div className="flex justify-end pt-2">
               <button type="submit" className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-1 transition">

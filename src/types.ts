@@ -148,5 +148,4 @@ export interface SystemSettings {
   chefiaObservacoesPadrao: string;
   municipiosGuanhaes: string[];
   municipiosAflobioPecanha: string[];
-  responsaveisTecnicos: string[];
 }

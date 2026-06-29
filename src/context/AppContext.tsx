@@ -107,8 +107,7 @@ const initialSettings: SystemSettings = {
   ],
   chefiaObservacoesPadrao: 'Orientação geral: conferir se shapes e CAR batem com limites da propriedade no cadastro do SIAM.',
   municipiosGuanhaes: initialMunicipalitiesGuanhaes,
-  municipiosAflobioPecanha: initialMunicipalitiesAflobio,
-  responsaveisTecnicos: []
+  municipiosAflobioPecanha: initialMunicipalitiesAflobio
 };
 
 const defaultAiaChecklist = (): ChecklistItem[] => [
