@@ -101,62 +101,82 @@ export const PlanilhasRelatorios: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
-        {/* Total stats */}
-        <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-xl space-y-4">
-          <h2 className="text-sm font-bold text-white uppercase tracking-wider text-slate-350 border-b border-slate-850 pb-2">Volume de Trabalho</h2>
-          
-          <div className="space-y-3">
-            <div className="bg-slate-950 p-3 rounded-lg border border-slate-850 flex justify-between items-center text-slate-300">
-              <span>Fila Ativa de Processos:</span>
-              <strong className="text-white text-sm">{active.length}</strong>
-            </div>
-
-            <div className="bg-slate-950 p-3 rounded-lg border border-slate-850 flex justify-between items-center text-slate-300">
-              <span>Processos Finalizados:</span>
-              <strong className="text-emerald-400 text-sm">{finalized.length}</strong>
-            </div>
-
-            <div className="bg-slate-950 p-3 rounded-lg border border-slate-850 flex justify-between items-center text-slate-300">
-              <span>Total de Cadastros:</span>
-              <strong className="text-white text-sm">{processes.length}</strong>
-            </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        {/* Planilha 1 */}
+        <div className="bg-slate-900/60 border border-slate-800 p-4 rounded-lg space-y-2">
+          <div className="flex items-center justify-between border-b border-slate-850 pb-1">
+            <strong className="text-white">1. PLANILHA DE DCF (RIO DOCE)</strong>
+            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">DCF</span>
+          </div>
+          <p className="text-slate-400">Controla todas as DCFs do regional. Preencher para cada DCF protocolada seguindo a organização proposta.</p>
+          <div className="bg-red-950/20 border border-red-900/30 p-2 rounded text-[10px] text-red-400">
+            <strong>Diretriz:</strong> Não inserir dados de DCFs recusadas.
           </div>
         </div>
 
-        {/* Demand grouping */}
-        <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-xl space-y-4">
-          <h2 className="text-sm font-bold text-white uppercase tracking-wider text-slate-350 border-b border-slate-850 pb-2">Demandas por Tipo</h2>
-          
-          <div className="space-y-2 max-h-[150px] overflow-y-auto pr-1">
-            {Object.keys(byType).length === 0 ? (
-              <p className="text-slate-500 italic text-[11px]">Nenhum processo cadastrado.</p>
-            ) : (
-              Object.entries(byType).map(([type, count]) => (
-                <div key={type} className="flex justify-between items-center text-slate-300 border-b border-slate-900 pb-1">
-                  <span>{type}:</span>
-                  <strong className="text-white">{count}</strong>
-                </div>
-              ))
-            )}
+        {/* Planilha 2 */}
+        <div className="bg-slate-900/60 border border-slate-800 p-4 rounded-lg space-y-2">
+          <div className="flex items-center justify-between border-b border-slate-850 pb-1">
+            <strong className="text-white">2. Controle Processos NAR e Aflobios</strong>
+            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Geral</span>
+          </div>
+          <p className="text-slate-400">Controla toda a demanda executada no NAR Guanhães (DCFs, Simples declarações, intervenção ambiental, cadastro de senha, emissão de carteira de pesca, queima controlada, pedido de restituição e pedido de vista).</p>
+        </div>
+
+        {/* Planilha 3 */}
+        <div className="bg-slate-900/60 border border-slate-800 p-4 rounded-lg space-y-2">
+          <div className="flex items-center justify-between border-b border-slate-850 pb-1">
+            <strong className="text-white">3. Processos para análise do Paulo</strong>
+            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Distribuição</span>
+          </div>
+          <p className="text-slate-400">Registrar as DCFs e Simples Declarações que forem encaminhadas diretamente para a análise do Paulo.</p>
+        </div>
+
+        {/* Planilha 4 */}
+        <div className="bg-slate-900/60 border border-slate-800 p-4 rounded-lg space-y-2">
+          <div className="flex items-center justify-between border-b border-slate-850 pb-1">
+            <strong className="text-white">4. Gestão processos AIA 2026</strong>
+            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">AIA</span>
+          </div>
+          <p className="text-slate-400">Inserir todos os processos de intervenção ambiental do regional.</p>
+          <div className="bg-slate-950 p-2 rounded text-[10px] text-slate-400">
+            Abas: <strong>"Processos Ativos"</strong> (protocolados) | <strong>Abas mensais</strong> (inserir processos finalizados naquele mês).
           </div>
         </div>
 
-        {/* Municipality grouping */}
-        <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-xl space-y-4">
-          <h2 className="text-sm font-bold text-white uppercase tracking-wider text-slate-350 border-b border-slate-850 pb-2">Distribuição Territorial</h2>
-          
-          <div className="space-y-2 max-h-[150px] overflow-y-auto pr-1">
-            {Object.keys(byMunicipio).length === 0 ? (
-              <p className="text-slate-500 italic text-[11px]">Nenhum processo cadastrado.</p>
-            ) : (
-              Object.entries(byMunicipio).map(([mun, count]) => (
-                <div key={mun} className="flex justify-between items-center text-slate-300 border-b border-slate-900 pb-1">
-                  <span>{mun}:</span>
-                  <strong className="text-white">{count}</strong>
-                </div>
-              ))
-            )}
+        {/* Planilha 5 */}
+        <div className="bg-slate-900/60 border border-slate-800 p-4 rounded-lg space-y-2">
+          <div className="flex items-center justify-between border-b border-slate-850 pb-1">
+            <strong className="text-white">5. Gestão DCF, SD e Queima – 2026</strong>
+            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Soma Mensal</span>
+          </div>
+          <p className="text-slate-400">Soma quantitativa de processos de DCF, simples declaração e queima controlada de cada mês.</p>
+          <div className="bg-slate-950 p-2 rounded text-[10px] text-slate-400">
+            <strong>Prazo:</strong> Preencher no início do mês seguinte, obrigatoriamente no período da tarde.
+          </div>
+        </div>
+
+        {/* Planilha 6 */}
+        <div className="bg-slate-900/60 border border-slate-800 p-4 rounded-lg space-y-2">
+          <div className="flex items-center justify-between border-b border-slate-850 pb-1">
+            <strong className="text-white">6. Controle de Condicionantes _ NARGuanhães</strong>
+            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Compensações</span>
+          </div>
+          <p className="text-slate-400">Inserir os processos de intervenção ambiental que tenham compensações a cumprir.</p>
+          <div className="bg-amber-950/20 border border-amber-900/30 p-2 rounded text-[10px] text-amber-400">
+            Acompanhar prazos. Se não cumpridos, informar ao Márcio para expedição de ofício. Colocar fluxo em <strong>"ACOMPANHAMENTO DE MEDIDAS COMPENSATÓRIAS"</strong>.
+          </div>
+        </div>
+
+        {/* Planilha 7 */}
+        <div className="bg-slate-900/60 border border-slate-800 p-4 rounded-lg space-y-2 col-span-1 md:col-span-2">
+          <div className="flex items-center justify-between border-b border-slate-850 pb-1">
+            <strong className="text-white">7. Controle arquivo NAR Guanhães</strong>
+            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Arquivo Físico</span>
+          </div>
+          <p className="text-slate-400">Consulta de processos físicos arquivados localmente. Ao receber processo físico de outra unidade, registre aqui e arquive na respectiva caixa.</p>
+          <div className="bg-sky-950/20 border border-sky-900/30 p-2 rounded text-[10px] text-sky-400">
+            <strong>Aba Planilha 2:</strong> Contém o modelo para impressão e colagem identificadora nas novas caixas de arquivo.
           </div>
         </div>
       </div>

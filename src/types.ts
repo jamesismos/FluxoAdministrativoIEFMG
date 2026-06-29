@@ -97,7 +97,7 @@ export interface ASVRecord {
   quilometragemRetorno?: number;
   horarioRetorno?: string;
   observacao: string;
-  status: 'Saída' | 'Retorno' | 'Oficina';
+  status: 'Aberta OK' | 'Fechada' | 'Enviada p/ Assinatura GOV' | 'Arquivada (Pasta Camila)';
   createdAt: string;
 }
 

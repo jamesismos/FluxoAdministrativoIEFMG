@@ -12,7 +12,7 @@ interface AiaProps {
 
 export const Aia: React.FC<AiaProps> = ({ activeProcessId, onNavigate }) => {
   const { processes, updateProcess, deleteProcess, settings } = useApp();
-  const [subTab, setSubTab] = useState<'geral' | 'docs' | 'checklist' | 'pendencias' | 'despacho' | 'memorando' | 'acompanhamento' | 'finalizacao'>('geral');
+  const [subTab, setSubTab] = useState<'geral' | 'docs' | 'checklist' | 'procedimento_sei' | 'acompanhamento' | 'finalizacao'>('geral');
 
   // Load the current active process
   const process = processes.find(p => p.id === activeProcessId && p.type === 'AIA');
@@ -22,9 +22,6 @@ export const Aia: React.FC<AiaProps> = ({ activeProcessId, onNavigate }) => {
   const [intervencoes, setIntervencoes] = useState<string[]>([]);
   const [documentosColados, setDocumentosColados] = useState('');
   const [checklist, setChecklist] = useState<ChecklistItem[]>([]);
-  const [pendenciasText, setPendenciasText] = useState('');
-  const [despachoGerado, setDespachoGerado] = useState('');
-  const [memorandoGerado, setMemorandoGerado] = useState('');
   const [responsavelTecnico, setResponsavelTecnico] = useState('');
   const [feedbackMsg, setFeedbackMsg] = useState('');
 
@@ -35,9 +32,6 @@ export const Aia: React.FC<AiaProps> = ({ activeProcessId, onNavigate }) => {
       setIntervencoes(process.aiaData.intervencoes || []);
       setDocumentosColados(process.aiaData.documentosColados || '');
       setChecklist(process.aiaData.checklist || []);
-      setPendenciasText(process.aiaData.pendenciasText || '');
-      setDespachoGerado(process.aiaData.despachoGerado || '');
-      setMemorandoGerado(process.aiaData.memorandoGerado || '');
       setResponsavelTecnico(process.responsavelInterno || '');
     }
   }, [activeProcessId, process]);
@@ -79,9 +73,9 @@ export const Aia: React.FC<AiaProps> = ({ activeProcessId, onNavigate }) => {
         intervencoes,
         documentosColados,
         checklist,
-        pendenciasText,
-        despachoGerado,
-        memorandoGerado
+        pendenciasText: '',
+        despachoGerado: '',
+        memorandoGerado: ''
       }
     });
 
@@ -163,85 +157,7 @@ export const Aia: React.FC<AiaProps> = ({ activeProcessId, onNavigate }) => {
     alert(`Parser executado! Encontrados ${parsedDocs.length} documentos. Sugestões inseridas no checklist.`);
   };
 
-  // Generate pendencies text from unfulfilled items
-  const handleGeneratePendencias = () => {
-    const unfulfilled = checklist.filter(item => item.status === 'NÃO' || item.status === 'A VERIFICAR');
-    if (unfulfilled.length === 0) {
-      setPendenciasText('Nenhuma pendência encontrada. Todos os documentos necessários foram anexados.');
-      return;
-    }
 
-    let text = `Após conferência preliminar da documentação apresentada para o processo SEI nº ${process.seiNumber}, em observância ao Decreto nº 47.749/2019 e à Resolução Conjunta SEMAD/IEF nº 3.102/2021, constatou-se a necessidade de saneamento e apresentação dos seguintes documentos/informações complementares:\n\n`;
-    
-    unfulfilled.forEach((item, index) => {
-      text += `${index + 1}. [${item.id}] ${item.description}${item.fundamento ? ` (Fundamento: ${item.fundamento})` : ''};\n`;
-    });
-
-    text += `\nPrazo para resposta: 30 (trinta) dias, sob pena de indeferimento/arquivamento do feito nos termos da Lei Estadual nº 14.184/2002.`;
-    setPendenciasText(text);
-    setSubTab('pendencias');
-  };
-
-  // Generate dispatch text
-  const handleGenerateDespacho = () => {
-    const dataAtual = new Date().toLocaleDateString('pt-BR');
-    const interventionsStr = intervencoes.join(', ');
-
-    const text = `Processo SEI: ${process.seiNumber}
-Interessado: ${process.requerente}
-Intervenção Requerida: ${interventionsStr}
-Município: ${process.municipio}
-
-DESPACHO DE ACEITE E ENCAMINHAMENTO - NAR GUANHÃES
-
-1. Realizada conferência preliminar formal em conformidade com as diretrizes da Resolução Conjunta SEMAD/IEF nº 3.102/2021. Constatou-se a presença das peças documentais mínimas obrigatórias para a regular instrução e formalização do processo.
-2. Fica admitida a tramitação administrativa do feito, observando-se que a presente análise restringe-se aos aspectos meramente documentais de instrução, não vinculando, prejulgando ou substituindo a análise técnica de campo e de mérito a ser efetuada pela equipe competente.
-3. Encaminhe-se à análise técnica do servidor ${responsavelTecnico} para vistoria in loco e elaboração do Parecer Técnico.
-
-${settings.nomeUnidade}, ${dataAtual}.
-
-__________________________________________
-${settings.servidorPadrao}
-Servidor Administrativo - ${settings.nomeUnidade}`;
-
-    setDespachoGerado(text);
-    setSubTab('despacho');
-  };
-
-  // Generate memorandum text
-  const handleGenerateMemorando = () => {
-    const dataAtual = new Date().toLocaleDateString('pt-BR');
-    const ano = new Date().getFullYear();
-    const interventionsStr = intervencoes.join(', ');
-
-    const text = `MEMORANDO Nº ____/${ano} - ${settings.nomeUnidade}
-
-Para: Setor Técnico / ${responsavelTecnico}
-Assunto: Encaminhamento de processo para análise e parecer técnico de AIA
-Processo SEI: ${process.seiNumber}
-Interessado: ${process.requerente}
-Intervenção: ${interventionsStr}
-Município: ${process.municipio}
-
-1. Encaminhamos para análise técnica o processo epigrafado, cuja triagem formal de documentos de instrução foi concluída favoravelmente (conforme Despacho de Aceite).
-2. Solicita-se a realização de vistoria de campo e a emissão do competente Parecer Técnico Ambiental sobre a viabilidade da intervenção requerida.
-3. Ponto de atenção/Orientação da Chefia (${settings.chefiaNome}): ${process.chefiaOrientacao || 'Sem anotações de dúvida cadastrada pela chefia.'}
-4. Responsável pela condução da próxima etapa: ${responsavelTecnico}.
-
-Atenciosamente,
-
-__________________________________________
-${settings.servidorPadrao}
-${settings.nomeUnidade}`;
-
-    setMemorandoGerado(text);
-    setSubTab('memorando');
-  };
-
-  const handleCopyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    alert('Copiado para a área de transferência!');
-  };
 
   return (
     <div className="space-y-6">
@@ -301,34 +217,22 @@ ${settings.nomeUnidade}`;
           C) Check-list
         </button>
         <button 
-          onClick={() => setSubTab('pendencias')}
-          className={`px-3 py-2 text-xs font-semibold border-b-2 transition ${subTab === 'pendencias' ? 'border-emerald-500 text-emerald-400' : 'border-transparent text-slate-400 hover:text-white'}`}
+          onClick={() => setSubTab('procedimento_sei')}
+          className={`px-3 py-2 text-xs font-semibold border-b-2 transition ${subTab === 'procedimento_sei' ? 'border-emerald-500 text-emerald-400' : 'border-transparent text-slate-400 hover:text-white'}`}
         >
-          D) Pendências
-        </button>
-        <button 
-          onClick={() => setSubTab('despacho')}
-          className={`px-3 py-2 text-xs font-semibold border-b-2 transition ${subTab === 'despacho' ? 'border-emerald-500 text-emerald-400' : 'border-transparent text-slate-400 hover:text-white'}`}
-        >
-          E) Despacho Aceite
-        </button>
-        <button 
-          onClick={() => setSubTab('memorando')}
-          className={`px-3 py-2 text-xs font-semibold border-b-2 transition ${subTab === 'memorando' ? 'border-emerald-500 text-emerald-400' : 'border-transparent text-slate-400 hover:text-white'}`}
-        >
-          F) Memorando Técnico
+          D) Procedimentos SEI
         </button>
         <button 
           onClick={() => setSubTab('acompanhamento')}
           className={`px-3 py-2 text-xs font-semibold border-b-2 transition ${subTab === 'acompanhamento' ? 'border-emerald-500 text-emerald-400' : 'border-transparent text-slate-400 hover:text-white'}`}
         >
-          G) Acompanhamento
+          E) Acompanhamento
         </button>
         <button 
           onClick={() => setSubTab('finalizacao')}
           className={`px-3 py-2 text-xs font-semibold border-b-2 transition ${subTab === 'finalizacao' ? 'border-emerald-500 text-emerald-400' : 'border-transparent text-slate-400 hover:text-white'}`}
         >
-          H) Finalização
+          F) Finalização
         </button>
       </div>
 
@@ -508,142 +412,60 @@ ${settings.nomeUnidade}`;
                         setChecklist(updated);
                       }}
                       placeholder="Observação..."
-                      className="bg-slate-900 border border-slate-800 rounded px-2 py-1 text-[10px] text-slate-300 focus:outline-none focus:border-emerald-500 w-36"
+                      className="bg-slate-900 border border-slate-800 rounded px-2 py-1 text-white text-[10px] w-40 focus:outline-none"
                     />
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="flex justify-between border-t border-slate-800 pt-4">
+            <div className="flex justify-end border-t border-slate-800 pt-4">
               <button 
-                onClick={handleGeneratePendencias}
-                className="bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-1 transition"
+                onClick={() => { handleSave(true); setSubTab('procedimento_sei'); }}
+                className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition cursor-pointer"
               >
-                <AlertCircle size={14} />
-                Gerar Lista de Pendências
-              </button>
-              <button 
-                onClick={() => { handleSave(true); setSubTab('pendencias'); }}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition"
-              >
-                Salvar e Ver Pendências
+                Salvar e Ver Procedimentos SEI
               </button>
             </div>
           </div>
         )}
 
-        {/* Tab D: Pendencias */}
-        {subTab === 'pendencias' && (
+        {/* Tab D: Procedimentos SEI */}
+        {subTab === 'procedimento_sei' && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-              <div>
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider text-slate-300">Minuta de Notificação de Pendências</h3>
-                <p className="text-slate-400 text-xs">Texto pré-elaborado com todos os itens marcados como NÃO ou A VERIFICAR para envio ao interessado.</p>
-              </div>
-              <button 
-                onClick={() => handleCopyToClipboard(pendenciasText)}
-                className="bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs px-3 py-1.5 rounded flex items-center gap-1.5 transition"
-              >
-                <Copy size={12} />
-                Copiar Texto SEI
-              </button>
+            <div className="border-b border-slate-800 pb-2">
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider text-slate-350">Procedimentos e Modelos no SEI</h3>
+              <p className="text-slate-400 text-xs">Os modelos de documentos oficiais e sigilosos do IEF estão salvos e favoritados diretamente no sistema SEI. Utilize-os conforme abaixo:</p>
             </div>
 
-            <textarea 
-              value={pendenciasText}
-              onChange={e => setPendenciasText(e.target.value)}
-              className="w-full h-64 bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs text-slate-300 font-mono focus:outline-none focus:border-emerald-500"
-            />
-
-            <div className="flex justify-end gap-2 border-t border-slate-800 pt-4">
-              <button 
-                onClick={handleGenerateDespacho}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition"
-              >
-                Gerar Despacho de Aceite
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Tab E: Despacho */}
-        {subTab === 'despacho' && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-              <div>
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider text-slate-300">Despacho de Aceite Documental</h3>
-                <p className="text-slate-400 text-xs">Decisão administrativa de formalização para ser colada no SEI.</p>
+            <div className="space-y-4 text-xs">
+              <div className="bg-slate-950 p-4 rounded-lg border border-slate-850 space-y-2">
+                <span className="font-semibold text-white block text-sm">Caso Haja Pendências Documentais:</span>
+                <p className="text-slate-400"><strong>DENTRO DO SEI HÁ MODELO PARA:</strong> Notificação de Pendências de AIA (fica em favoritos). Inicie um documento do tipo <strong>Ofício</strong> ou <strong>Despacho</strong> e transcreva a lista de pendências identificadas:</p>
+                
+                <div className="bg-slate-900 p-3 rounded border border-slate-800 text-slate-300 font-mono text-[10px] space-y-1">
+                  <p className="font-bold text-slate-400 uppercase">Itens a notificar:</p>
+                  {checklist.filter(c => c.status === 'NÃO' || c.status === 'A VERIFICAR').length === 0 ? (
+                    <p className="italic text-slate-500">Nenhum documento pendente listado no checklist local.</p>
+                  ) : (
+                    checklist.filter(c => c.status === 'NÃO' || c.status === 'A VERIFICAR').map(c => (
+                      <p key={c.id}>• {c.description} (Fundamento: {c.fundamento})</p>
+                    ))
+                  )}
+                </div>
               </div>
-              <div className="flex gap-2">
-                <button 
-                  onClick={handleGenerateDespacho}
-                  className="bg-slate-900 hover:bg-slate-800 text-slate-400 text-xs px-2 py-1 rounded border border-slate-800"
-                >
-                  Regerar
-                </button>
-                <button 
-                  onClick={() => handleCopyToClipboard(despachoGerado)}
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-1.5 rounded flex items-center gap-1.5 transition"
-                >
-                  <Copy size={12} />
-                  Copiar Texto SEI
-                </button>
+
+              <div className="bg-slate-950 p-4 rounded-lg border border-slate-850 space-y-2">
+                <span className="font-semibold text-white block text-sm">Caso Todos os Documentos Estejam Aptos (Aceite):</span>
+                <p className="text-slate-400"><strong>DENTRO DO SEI HÁ MODELO PARA:</strong> Despacho de Aceite Documental de AIA (fica em favoritos). Inicie um documento do tipo <strong>Despacho</strong> e salve a aceitação no SEI.</p>
+                <p className="text-slate-400">Em seguida, utilize o modelo favoritado no SEI de <strong>Memorando de Encaminhamento Técnico</strong> para distribuir a demanda para o analista responsável: <strong className="text-slate-200">{responsavelTecnico || '(Técnico não definido)'}</strong>.</p>
               </div>
             </div>
-
-            <textarea 
-              value={despachoGerado}
-              onChange={e => setDespachoGerado(e.target.value)}
-              className="w-full h-64 bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs text-slate-300 font-mono focus:outline-none focus:border-emerald-500"
-            />
-
-            <div className="flex justify-end gap-2 border-t border-slate-800 pt-4">
-              <button 
-                onClick={handleGenerateMemorando}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition"
-              >
-                Gerar Memorando Técnico
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Tab F: Memorando */}
-        {subTab === 'memorando' && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-              <div>
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider text-slate-300">Memorando para Análise Técnica</h3>
-                <p className="text-slate-400 text-xs">Encaminhamento interno para realização de vistoria e parecer.</p>
-              </div>
-              <div className="flex gap-2">
-                <button 
-                  onClick={handleGenerateMemorando}
-                  className="bg-slate-900 hover:bg-slate-800 text-slate-400 text-xs px-2 py-1 rounded border border-slate-800"
-                >
-                  Regerar
-                </button>
-                <button 
-                  onClick={() => handleCopyToClipboard(memorandoGerado)}
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-1.5 rounded flex items-center gap-1.5 transition"
-                >
-                  <Copy size={12} />
-                  Copiar Texto SEI
-                </button>
-              </div>
-            </div>
-
-            <textarea 
-              value={memorandoGerado}
-              onChange={e => setMemorandoGerado(e.target.value)}
-              className="w-full h-64 bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs text-slate-300 font-mono focus:outline-none focus:border-emerald-500"
-            />
 
             <div className="flex justify-end gap-2 border-t border-slate-800 pt-4">
               <button 
                 onClick={() => { handleSave(true); setSubTab('acompanhamento'); }}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition"
+                className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition cursor-pointer"
               >
                 Ir para Acompanhamento
               </button>
@@ -651,7 +473,7 @@ ${settings.nomeUnidade}`;
           </div>
         )}
 
-        {/* Tab G: Acompanhamento */}
+        {/* Tab E: Acompanhamento */}
         {subTab === 'acompanhamento' && (
           <div className="space-y-4">
             <h3 className="text-sm font-bold text-white uppercase tracking-wider text-slate-300">Configurações de Tramitação e Chefia</h3>

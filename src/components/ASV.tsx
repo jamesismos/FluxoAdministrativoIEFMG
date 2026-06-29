@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { ASVRecord } from '../types';
-import { Car, Clock, ShieldAlert, Plus, HelpCircle, Save } from 'lucide-react';
+import { Car, Clock, ShieldAlert, Plus, HelpCircle, Save, CheckSquare } from 'lucide-react';
 
 export const ASV: React.FC = () => {
   const { asvRecords, addASVRecord, updateASVRecord } = useApp();
@@ -37,7 +37,7 @@ export const ASV: React.FC = () => {
       quilometragemSaida,
       horarioSaida,
       observacao,
-      status: tipoAtendimento.includes('Oficina') ? 'Oficina' : 'Saída'
+      status: 'Aberta OK'
     });
 
     // Reset
@@ -47,7 +47,7 @@ export const ASV: React.FC = () => {
     setQuilometragemSaida(0);
     setHorarioSaida('');
     setObservacao('');
-    alert('Saída de Veículo registrada com sucesso!');
+    alert('ASV criada e marcada como "Aberta OK"!');
   };
 
   const handleReturn = (id: string) => {
@@ -65,20 +65,20 @@ export const ASV: React.FC = () => {
     updateASVRecord(id, {
       quilometragemRetorno,
       horarioRetorno,
-      status: 'Retorno',
+      status: 'Fechada',
     });
 
     setQuilometragemRetorno(0);
     setHorarioRetorno('');
     setActiveAsvId(null);
-    alert('Retorno registrado com sucesso no sistema local!');
+    alert('Viagem fechada e marcada como "Fechada"!');
   };
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-white">Controle de Veículos e Frota (ASV)</h1>
-        <p className="text-slate-400 text-sm">Controle interno de saídas de veículos, registro de quilometragem e guia de integração com o sistema SIAD/pw3270.</p>
+        <p className="text-slate-400 text-sm">Controle de saídas de veículos, registro de quilometragem e controle do fluxo de assinaturas e arquivamento das ASVs.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -86,27 +86,29 @@ export const ASV: React.FC = () => {
         <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-xl text-xs space-y-4">
           <h2 className="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-2">
             <HelpCircle className="text-sky-400" size={16} />
-            Guia Operacional SIAD / pw3270
+            Fluxo da ASV (Passo a Passo)
           </h2>
 
           <div className="space-y-3 text-slate-350">
-            <p className="text-slate-400">Rotina diária para emissão da Autorização de Saída de Veículo (ASV):</p>
-            <ol className="list-decimal pl-4 space-y-2">
-              <li>Abra o terminal <strong className="text-white">pw3270</strong> (Host de Acesso Estado);</li>
-              <li>Acesse a aplicação <strong className="text-white">SIAD</strong> com seu usuário e senha;</li>
-              <li>Navegue até a opção <strong className="text-white">Atendimento 06</strong> (Gestão de Transportes);</li>
-              <li>Selecione <strong className="text-white">Atendimento sem Solicitação</strong> para saídas rápidas;</li>
-              <li>Preencha a placa do veículo, motorista cadastrado, destino, odômetro inicial e finalidade.</li>
-            </ol>
-
-            <div className="bg-slate-950 p-3 rounded-lg border border-slate-850 space-y-2">
-              <span className="font-semibold text-white block uppercase tracking-wider text-[9px]">Regras de Classificação:</span>
-              <ul className="list-disc pl-4 space-y-1 text-slate-400">
-                <li><strong className="text-slate-300">Tipo 1 (Local):</strong> Demandas dentro da comarca de Guanhães ou municípios limítrofes do núcleo.</li>
-                <li><strong className="text-slate-300">Tipo 2 (Viagem):</strong> Viagens de longa distância (Belo Horizonte, Governador Valadares, etc.).</li>
-                <li><strong className="text-slate-305">Tipo 3 (Oficina):</strong> Veículo deixado para reparo. Abrir ASV Tipo 3 indicando a km de entrega à oficina. Na retirada, fechar e abrir ASV Tipo 1 para retorno à base.</li>
-              </ul>
-            </div>
+            <p className="text-slate-400">Instruções para controle físico e digital das ASVs de acordo com o NAF:</p>
+            <ul className="list-decimal pl-4 space-y-2 text-slate-400">
+              <li>
+                <strong className="text-white">SIAD (pw3270):</strong> Acesse o terminal, navegue em <strong>Atendimento 06</strong> e abra/emita a ASV. 
+                Marque no sistema como <strong className="text-amber-400 font-semibold">Aberta OK</strong>.
+              </li>
+              <li>
+                <strong className="text-white">Retorno:</strong> Insira a quilometragem e o horário final da viagem. O status mudará para <strong className="text-blue-400 font-semibold">Fechada</strong>.
+              </li>
+              <li>
+                <strong className="text-white">Impressão e Assinatura:</strong> Tire um print da tela de fechamento no SIAD e imprima-a para que os condutores assinem fisicamente.
+              </li>
+              <li>
+                <strong className="text-white">Assinatura GOV / E-mail:</strong> Escaneie e envie o documento para a Samira por e-mail, ou envie por e-mail para a assinatura GOV. Marcar como <strong className="text-purple-400 font-semibold">Enviada p/ Assinatura GOV</strong>.
+              </li>
+              <li>
+                <strong className="text-white">Arquivamento:</strong> Assim que retornar assinado, salve o documento na pasta compartilhada de ASVs do núcleo (criada pela Camila) organizada por ano e placa, e guarde a cópia física na 1ª gaveta do gaveteiro. Marque como <strong className="text-emerald-400 font-semibold">Arquivada (Pasta Camila)</strong>.
+              </li>
+            </ul>
           </div>
         </div>
 
@@ -114,7 +116,7 @@ export const ASV: React.FC = () => {
         <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-xl text-xs space-y-4">
           <h2 className="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-2">
             <Plus className="text-emerald-400" size={16} />
-            Nova Abertura de ASV (Saída)
+            Nova Saída de Veículo (Registrar no SIAD)
           </h2>
 
           <form onSubmit={handleCreate} className="space-y-3">
@@ -200,7 +202,7 @@ export const ASV: React.FC = () => {
               <textarea 
                 value={observacao}
                 onChange={e => setObservacao(e.target.value)}
-                className="w-full h-16 bg-slate-950 border border-slate-850 rounded p-2 text-white"
+                className="w-full h-12 bg-slate-950 border border-slate-850 rounded p-2 text-white"
               />
             </div>
 
@@ -208,7 +210,7 @@ export const ASV: React.FC = () => {
               type="submit"
               className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 rounded-lg transition"
             >
-              Registrar Saída
+              Abrir ASV (Aberta OK)
             </button>
           </form>
         </div>
@@ -217,18 +219,23 @@ export const ASV: React.FC = () => {
         <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-xl text-xs space-y-4">
           <h2 className="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-2">
             <Car className="text-emerald-400" size={16} />
-            Fila Ativa de Viagens
+            Fila de Controle de ASVs
           </h2>
 
           {asvRecords.length === 0 ? (
-            <p className="text-slate-500 italic">Nenhuma viagem em andamento no registro local.</p>
+            <p className="text-slate-500 italic">Nenhum registro de veículo em trâmite local.</p>
           ) : (
-            <div className="space-y-3 overflow-y-auto max-h-[380px]">
+            <div className="space-y-3 overflow-y-auto max-h-[380px] pr-1">
               {asvRecords.map(rec => (
-                <div key={rec.id} className="p-3 bg-slate-950 border border-slate-850 rounded-lg space-y-2">
+                <div key={rec.id} className="p-3 bg-slate-950 border border-slate-850 rounded-lg space-y-2 text-xs">
                   <div className="flex justify-between items-start">
                     <span className="font-mono font-bold text-white bg-slate-850 px-2 py-0.5 rounded border border-slate-800">{rec.placa}</span>
-                    <span className={`px-2 py-0.5 rounded text-[9px] font-bold ${rec.status === 'Saída' ? 'bg-amber-950 text-amber-400' : rec.status === 'Oficina' ? 'bg-red-950 text-red-400' : 'bg-emerald-950 text-emerald-400'}`}>
+                    <span className={`px-2 py-0.5 rounded text-[8px] font-bold ${
+                      rec.status === 'Aberta OK' ? 'bg-amber-955/20 text-amber-400 border border-amber-800/30' : 
+                      rec.status === 'Fechada' ? 'bg-blue-955/20 text-blue-400 border border-blue-800/30' :
+                      rec.status === 'Enviada p/ Assinatura GOV' ? 'bg-purple-955/20 text-purple-400 border border-purple-800/30' :
+                      'bg-emerald-955/20 text-emerald-400 border border-emerald-800/30'
+                    }`}>
                       {rec.status}
                     </span>
                   </div>
@@ -238,36 +245,89 @@ export const ASV: React.FC = () => {
                     <p>Destino: <span className="font-semibold text-white">{rec.destino}</span></p>
                     <p>Saída: <span className="font-semibold text-slate-100">{rec.horarioSaida}</span> | Odômetro: <span className="font-semibold font-mono text-emerald-400">{rec.quilometragemSaida} km</span></p>
                     
-                    {rec.status === 'Retorno' && (
-                      <p className="text-emerald-400">Retorno: <span className="font-semibold">{rec.horarioRetorno}</span> | Odômetro: <span className="font-semibold font-mono">{rec.quilometragemRetorno} km</span> (Total: {rec.quilometragemRetorno! - rec.quilometragemSaida} km)</p>
-                    )}
+                    {rec.quilometragemRetorno ? (
+                      <p className="text-emerald-400">Retorno: <span className="font-semibold">{rec.horarioRetorno}</span> | Odômetro: <span className="font-semibold font-mono">{rec.quilometragemRetorno} km</span> (Total: {rec.quilometragemRetorno - rec.quilometragemSaida} km)</p>
+                    ) : null}
                   </div>
 
-                  {rec.status !== 'Retorno' && (
-                    <div className="border-t border-slate-800 pt-2 space-y-2 mt-2">
-                      <p className="font-semibold text-[10px] text-slate-300">Registrar Retorno no Sistema:</p>
-                      <div className="grid grid-cols-2 gap-2">
-                        <input 
-                          type="number"
-                          placeholder="km retorno"
-                          onChange={e => setQuilometragemRetorno(Number(e.target.value))}
-                          className="bg-slate-900 border border-slate-800 rounded px-1.5 py-1 text-[10px] text-white"
-                        />
-                        <input 
-                          type="text"
-                          placeholder="Horário (Ex: 17:15)"
-                          onChange={e => setHorarioRetorno(e.target.value)}
-                          className="bg-slate-900 border border-slate-800 rounded px-1.5 py-1 text-[10px] text-white font-mono"
-                        />
+                  {/* Flow control buttons */}
+                  <div className="border-t border-slate-900 pt-2 space-y-2 mt-2">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[9px] text-slate-500 font-bold uppercase">Fluxo da ASV:</span>
+                      <div className="grid grid-cols-2 gap-1 text-[9px]">
+                        <button
+                          type="button"
+                          onClick={() => updateASVRecord(rec.id, { status: 'Aberta OK' })}
+                          className={`py-1 rounded text-center font-semibold transition cursor-pointer ${rec.status === 'Aberta OK' ? 'bg-amber-600 text-white' : 'bg-slate-900 text-slate-400 hover:bg-slate-850'}`}
+                        >
+                          Aberta OK
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!rec.quilometragemRetorno) {
+                              setActiveAsvId(rec.id);
+                            } else {
+                              updateASVRecord(rec.id, { status: 'Fechada' });
+                            }
+                          }}
+                          className={`py-1 rounded text-center font-semibold transition cursor-pointer ${rec.status === 'Fechada' ? 'bg-blue-600 text-white' : 'bg-slate-900 text-slate-400 hover:bg-slate-850'}`}
+                        >
+                          Fechada
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => updateASVRecord(rec.id, { status: 'Enviada p/ Assinatura GOV' })}
+                          className={`py-1 rounded text-center font-semibold transition cursor-pointer ${rec.status === 'Enviada p/ Assinatura GOV' ? 'bg-purple-600 text-white' : 'bg-slate-900 text-slate-400 hover:bg-slate-850'}`}
+                        >
+                          Assinatura GOV
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => updateASVRecord(rec.id, { status: 'Arquivada (Pasta Camila)' })}
+                          className={`py-1 rounded text-center font-semibold transition cursor-pointer ${rec.status === 'Arquivada (Pasta Camila)' ? 'bg-emerald-600 text-white' : 'bg-slate-900 text-slate-400 hover:bg-slate-850'}`}
+                        >
+                          Pasta Camila
+                        </button>
                       </div>
-                      <button
-                        onClick={() => handleReturn(rec.id)}
-                        className="w-full bg-emerald-600/20 text-emerald-400 border border-emerald-500/20 py-1 rounded text-[10px] font-bold hover:bg-emerald-600 hover:text-white transition"
-                      >
-                        Confirmar Retorno
-                      </button>
                     </div>
-                  )}
+
+                    {activeAsvId === rec.id && (
+                      <div className="bg-slate-900 p-2 rounded border border-slate-800 space-y-1.5 mt-1.5">
+                        <span className="font-semibold text-[9px] text-white">Salvar Retorno (SIAD):</span>
+                        <div className="grid grid-cols-2 gap-1">
+                          <input 
+                            type="number"
+                            placeholder="km retorno"
+                            onChange={e => setQuilometragemRetorno(Number(e.target.value))}
+                            className="bg-slate-950 border border-slate-850 rounded px-1.5 py-1 text-[10px] text-white"
+                          />
+                          <input 
+                            type="text"
+                            placeholder="Horário (17:15)"
+                            onChange={e => setHorarioRetorno(e.target.value)}
+                            className="bg-slate-950 border border-slate-850 rounded px-1.5 py-1 text-[10px] text-white font-mono"
+                          />
+                        </div>
+                        <div className="flex gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => handleReturn(rec.id)}
+                            className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-1 rounded text-[10px] font-bold transition cursor-pointer"
+                          >
+                            Fechar Viagem
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setActiveAsvId(null)}
+                            className="bg-slate-850 text-slate-300 py-1 px-2 rounded text-[10px] hover:bg-slate-800"
+                          >
+                            Cancelar
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

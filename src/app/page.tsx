@@ -9,7 +9,7 @@ import { Dcf } from '../components/Dcf';
 import { SimplesDeclaracao } from '../components/SimplesDeclaracao';
 import { TaxasDAE } from '../components/TaxasDAE';
 import { ASV } from '../components/ASV';
-import { ModelosSEI } from '../components/ModelosSEI';
+import { RotinasTarefas } from '../components/RotinasTarefas';
 import { AcompanhamentosBlocos } from '../components/AcompanhamentosBlocos';
 import { ValidacaoChefia } from '../components/ValidacaoChefia';
 import { PlanilhasRelatorios } from '../components/PlanilhasRelatorios';
@@ -24,7 +24,7 @@ import {
   CheckSquare, 
   DollarSign, 
   Car, 
-  Library, 
+  Calendar, 
   FolderHeart, 
   UserCheck, 
   BarChart3, 
@@ -65,8 +65,8 @@ export default function Home() {
         return <TaxasDAE />;
       case 'ASV / Veículos':
         return <ASV />;
-      case 'Modelos SEI':
-        return <ModelosSEI />;
+      case 'Rotinas e Tarefas Diárias':
+        return <RotinasTarefas />;
       case 'Acompanhamentos e Blocos':
         return <AcompanhamentosBlocos onNavigate={handleNavigate} />;
       case 'Validação da Chefia':
@@ -90,7 +90,7 @@ export default function Home() {
     { name: 'Simples Declaração', icon: <CheckSquare size={16} /> },
     { name: 'Taxas / DAE / Restituição', icon: <DollarSign size={16} /> },
     { name: 'ASV / Veículos', icon: <Car size={16} /> },
-    { name: 'Modelos SEI', icon: <Library size={16} /> },
+    { name: 'Rotinas e Tarefas Diárias', icon: <Calendar size={16} /> },
     { name: 'Acompanhamentos e Blocos', icon: <FolderHeart size={16} /> },
     { name: 'Validação da Chefia', icon: <UserCheck size={16} /> },
     { name: 'Planilhas / Relatórios', icon: <BarChart3 size={16} /> },

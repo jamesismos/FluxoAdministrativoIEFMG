@@ -32,14 +32,6 @@ export const Dcf: React.FC<DcfProps> = ({ activeProcessId, onNavigate }) => {
   const [daeAnoAnterior, setDaeAnoAnterior] = useState(false);
   const [pagamentoSiteFazendaConfirmado, setPagamentoSiteFazendaConfirmado] = useState(false);
 
-  const [despachoAceite, setDespachoAceite] = useState('');
-  const [memorandoTecnico, setMemorandoTecnico] = useState('');
-  const [despachoRecusa, setDespachoRecusa] = useState('');
-  const [comunicacaoRecusa, setComunicacaoRecusa] = useState('');
-  const [despachoSaldoSiam, setDespachoSaldoSiam] = useState('');
-  const [despachoAvaliacaoDcf, setDespachoAvaliacaoDcf] = useState('');
-  const [intimacaoEletronica, setIntimacaoEletronica] = useState('');
-
   const [feedbackMsg, setFeedbackMsg] = useState('');
 
   // Sync state when process changes
@@ -60,14 +52,6 @@ export const Dcf: React.FC<DcfProps> = ({ activeProcessId, onNavigate }) => {
       setTermoConcordanciaOutroProprietario(d.termoConcordanciaOutroProprietario);
       setDaeAnoAnterior(d.daeAnoAnterior);
       setPagamentoSiteFazendaConfirmado(d.pagamentoSiteFazendaConfirmado);
-
-      setDespachoAceite(d.despachoAceite || '');
-      setMemorandoTecnico(d.memorandoTecnico || '');
-      setDespachoRecusa(d.despachoRecusa || '');
-      setComunicacaoRecusa(d.comunicacaoRecusa || '');
-      setDespachoSaldoSiam(d.despachoSaldoSiam || '');
-      setDespachoAvaliacaoDcf(d.despachoAvaliacaoDcf || '');
-      setIntimacaoEletronica(d.intimacaoEletronica || '');
     }
   }, [activeProcessId, process]);
 
@@ -111,13 +95,13 @@ export const Dcf: React.FC<DcfProps> = ({ activeProcessId, onNavigate }) => {
         termoConcordanciaOutroProprietario,
         daeAnoAnterior,
         pagamentoSiteFazendaConfirmado,
-        despachoAceite,
-        memorandoTecnico,
-        despachoRecusa,
-        comunicacaoRecusa,
-        despachoSaldoSiam,
-        despachoAvaliacaoDcf,
-        intimacaoEletronica
+        despachoAceite: '',
+        memorandoTecnico: '',
+        despachoRecusa: '',
+        comunicacaoRecusa: '',
+        despachoSaldoSiam: '',
+        despachoAvaliacaoDcf: '',
+        intimacaoEletronica: ''
       }
     });
 
@@ -127,104 +111,7 @@ export const Dcf: React.FC<DcfProps> = ({ activeProcessId, onNavigate }) => {
     }
   };
 
-  // Document builders
-  const generateAptaTexts = () => {
-    const dataStr = new Date().toLocaleDateString('pt-BR');
-    
-    const despacho = `Processo SEI: ${process.seiNumber}
-Interessado: ${process.requerente}
-Município: ${process.municipio}
-Produto: ${produtoDeclarado} | Volume: ${volumeDeclarado}
 
-DESPACHO DE ACEITE ADM — DCF
-
-1. Em análise aos documentos de instrução da Declaração de Colheita e Florestas (DCF), constatou-se o atendimento das condicionantes formais, o recolhimento das respectivas taxas e o cadastro ativo do plantio.
-2. Defiro a formalização do presente expediente. 
-3. Nos termos da rotina de fluxos locais do IEF, encaminhe-se à análise e vistoria da equipe técnica para posterior homologação.
-
-${settings.nomeUnidade}, ${dataStr}.
-___________________________
-${settings.servidorPadrao}`;
-
-    const memo = `MEMORANDO Nº ____/${new Date().getFullYear()} - ${settings.nomeUnidade}
-
-Para: Setor Técnico / NUREG Rio Doce
-Assunto: Encaminhamento de processo de DCF para Homologação Técnica
-Processo SEI: ${process.seiNumber}
-Interessado: ${process.requerente}
-
-1. Encaminhamos o processo administrativo de DCF acima indicado, devidamente triado e com despacho de aceite documental anexado.
-2. Informa-se que o município ${process.municipio} ${isAflobio ? 'pertence à área de competência da AFLOBIO Peçanha. Encaminhar para o respectivo setor.' : 'será analisado localmente.'}
-3. Solicita-se vistoria florestal e elaboração de parecer sobre a colheita declarada.
-
-Atenciosamente,
-___________________________
-${settings.servidorPadrao}`;
-
-    setDespachoAceite(despacho);
-    setMemorandoTecnico(memo);
-  };
-
-  const generateRecusaTexts = () => {
-    const dataStr = new Date().toLocaleDateString('pt-BR');
-
-    const despacho = `Processo SEI: ${process.seiNumber}
-Interessado: ${process.requerente}
-
-DESPACHO DE RECUSA E INCOMPATIBILIDADE - DCF
-
-1. Em análise preliminar documental do presente pedido de DCF, verificaram-se desconformidades críticas de instrução, tais como pendências no pagamento de taxas ou ausência de cadastro de plantio atualizado no SIAM.
-2. Diante do exposto, indefiro a formalização do processo em sua forma atual. Notifique-se o declarante.
-
-NAR Guanhães, ${dataStr}.
-___________________________
-${settings.servidorPadrao}`;
-
-    const comun = `Prezado Senhor(a),
-Comunicamos que sua Declaração de Colheita e Florestas (DCF) protocolada sob o número SEI ${process.seiNumber} não pôde ser aceita em razão das seguintes pendências:
-- Ausência de comprovante de pagamento no site da Fazenda ou incoerência de taxas;
-- Falta de termo de concordância do proprietário da terra (quando aplicável);
-- Arquivos de shapefile/cadastro inexistentes ou corrompidos.
-
-Favor protocolar nova solicitação com os documentos devidamente saneados.`;
-
-    setDespachoRecusa(despacho);
-    setComunicacaoRecusa(comun);
-  };
-
-  const generateFinalizacaoTexts = () => {
-    const dataStr = new Date().toLocaleDateString('pt-BR');
-
-    const saldo = `Processo SEI: ${process.seiNumber}
-Interessado: ${process.requerente}
-
-DESPACHO DE CADASTRO DE SALDO - SIAM/CAF
-
-1. Tendo em vista a homologação técnica favorável do parecer de colheita, determino o lançamento e liberação do saldo de ${produtoDeclarado} (Volume: ${volumeDeclarado}) no Sistema SIAM/CAF da Fazenda para emissão de documentos de transporte florestal.
-2. Atualize-se a planilha de controle de saldo local.
-
-${settings.nomeUnidade}, ${dataStr}.
-___________________________
-Chefia do Núcleo - ${settings.chefiaNome}`;
-
-    const avaliacao = `DESPACHO DE AVALIAÇÃO DCF/DAIA
-
-1. Homologo a Declaração de Colheita e Florestas (DCF) sob o processo ${process.seiNumber}.
-2. Arquivem-se os autos com as devidas baixas nas planilhas e encerramento do acompanhamento especial.`;
-
-    const intimacao = `INTIMAÇÃO ELETRÔNICA - CIÊNCIA DCF
-
-Fica o declarante ${process.requerente} cientificado de que a Declaração de Colheita e Florestas (DCF) sob o processo SEI ${process.seiNumber} foi devidamente homologada e o saldo florestal encontra-se disponível no sistema SIAM para movimentação legal.`;
-
-    setDespachoSaldoSiam(saldo);
-    setDespachoAvaliacaoDcf(avaliacao);
-    setIntimacaoEletronica(intimacao);
-  };
-
-  const handleCopyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    alert('Copiado para a área de transferência!');
-  };
 
   return (
     <div className="space-y-6">
@@ -431,84 +318,32 @@ Fica o declarante ${process.requerente} cientificado de que a Declaração de Co
           <div className="space-y-4 text-xs">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Opção DCF Apta */}
-              <div className="bg-slate-950 p-4 rounded-lg border border-slate-800 space-y-3">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                  <h4 className="font-bold text-emerald-400 uppercase tracking-wider">DCF Apta (Aceite)</h4>
-                  <button 
-                    onClick={generateAptaTexts}
-                    className="bg-emerald-600/10 text-emerald-400 border border-emerald-500/20 px-2 py-1 rounded text-[10px]"
-                  >
-                    Gerar Documentos
-                  </button>
+              <div className="bg-slate-950 p-5 rounded-lg border border-slate-800 space-y-3">
+                <h4 className="font-bold text-emerald-400 uppercase tracking-wider text-sm border-b border-slate-850 pb-2">Procedimento para DCF Apta (Aceite)</h4>
+                <p className="text-slate-350 leading-relaxed">Se todos os documentos e taxas estiverem conformes, proceda com o aceite no SEI:</p>
+                <div className="bg-slate-900/60 p-3.5 rounded border border-slate-800 space-y-2 text-slate-400">
+                  <p><strong>DENTRO DO SEI HÁ MODELO PARA:</strong> Despacho de Aceite de DCF (fica em favoritos).</p>
+                  <p><strong>DENTRO DO SEI HÁ MODELO PARA:</strong> Memorando de Distribuição de DCF (fica em favoritos).</p>
+                  <ul className="list-disc pl-4 space-y-1 mt-2 text-[11px] text-slate-400">
+                    <li>Ao enviar o processo, lembre-se de deixá-lo aberto na nossa unidade com um lembrete informando sobre a situação.</li>
+                    <li>No caso de municípios da Aflobio Peçanha, encaminhe o processo para que a Ana Célia faça a análise de documentos.</li>
+                    <li>Quando o despacho de aceite e o memorando de distribuição estiverem finalizados, coloque o processo em acompanhamento especial <strong>"DCFs Ativas"</strong> e conclua-o no NAR.</li>
+                  </ul>
                 </div>
-                
-                {despachoAceite && (
-                  <div className="space-y-2">
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-slate-400 text-[10px]">Minuta Despacho Aceite</span>
-                        <button onClick={() => handleCopyToClipboard(despachoAceite)} className="text-sky-400 hover:underline flex items-center gap-1"><Copy size={10} /> Copiar</button>
-                      </div>
-                      <textarea value={despachoAceite} readOnly className="w-full h-24 bg-slate-900 border border-slate-850 rounded p-1.5 text-[10px] font-mono text-slate-300" />
-                    </div>
-
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-slate-400 text-[10px]">Minuta Memorando Técnico</span>
-                        <button onClick={() => handleCopyToClipboard(memorandoTecnico)} className="text-sky-400 hover:underline flex items-center gap-1"><Copy size={10} /> Copiar</button>
-                      </div>
-                      <textarea value={memorandoTecnico} readOnly className="w-full h-24 bg-slate-900 border border-slate-850 rounded p-1.5 text-[10px] font-mono text-slate-300" />
-                    </div>
-
-                    <div className="bg-slate-900 p-2.5 rounded border border-slate-850 text-slate-400 space-y-1">
-                      <p className="font-semibold text-white text-[10px]">Próximas ações pós-aceite:</p>
-                      <ul className="list-disc pl-4 space-y-0.5 text-[10px]">
-                        <li>Lembrar de pesquisar cadastro de plantio relacionado;</li>
-                        <li>Enviar para IEF/URFBio Rio Doce - NUREG;</li>
-                        <li>Lançar na planilha de DCFs Ativas;</li>
-                        <li>Concluir processo na unidade local.</li>
-                      </ul>
-                    </div>
-                  </div>
-                )}
               </div>
 
               {/* Opção DCF Incompleta */}
-              <div className="bg-slate-950 p-4 rounded-lg border border-slate-850 space-y-3">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                  <h4 className="font-bold text-red-400 uppercase tracking-wider">DCF Recusada / Incompleta</h4>
-                  <button 
-                    onClick={generateRecusaTexts}
-                    className="bg-red-650/10 text-red-400 border border-red-500/20 px-2 py-1 rounded text-[10px]"
-                  >
-                    Gerar Recusa
-                  </button>
+              <div className="bg-slate-950 p-5 rounded-lg border border-slate-850 space-y-3">
+                <h4 className="font-bold text-red-400 uppercase tracking-wider text-sm border-b border-slate-850 pb-2">Procedimento para DCF Recusada</h4>
+                <p className="text-slate-350 leading-relaxed">Caso falte algum documento essencial ou a triagem resulte em recusa:</p>
+                <div className="bg-slate-900/60 p-3.5 rounded border border-slate-800 space-y-2 text-slate-400">
+                  <p><strong>DENTRO DO SEI HÁ MODELO PARA:</strong> Despacho de Recusa de DCF (fica em favoritos).</p>
+                  <p><strong>DENTRO DO SEI HÁ MODELO PARA:</strong> Comunicação de Recusa ao Declarante (fica em favoritos).</p>
+                  <ul className="list-disc pl-4 space-y-1 mt-2 text-[11px] text-slate-400">
+                    <li>Para os casos em que o processo for recusado, deverá somente concluí-lo no SEI sem nenhum outro procedimento administrativo adicional.</li>
+                    <li>Não inserir dados de DCFs recusadas na Planilha de DCF (Rio Doce).</li>
+                  </ul>
                 </div>
-
-                {despachoRecusa && (
-                  <div className="space-y-2">
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-slate-400 text-[10px]">Minuta Despacho Recusa</span>
-                        <button onClick={() => handleCopyToClipboard(despachoRecusa)} className="text-sky-400 hover:underline flex items-center gap-1"><Copy size={10} /> Copiar</button>
-                      </div>
-                      <textarea value={despachoRecusa} readOnly className="w-full h-24 bg-slate-900 border border-slate-850 rounded p-1.5 text-[10px] font-mono text-slate-300" />
-                    </div>
-
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-slate-400 text-[10px]">Texto Notificação Declarante</span>
-                        <button onClick={() => handleCopyToClipboard(comunicacaoRecusa)} className="text-sky-400 hover:underline flex items-center gap-1"><Copy size={10} /> Copiar</button>
-                      </div>
-                      <textarea value={comunicacaoRecusa} readOnly className="w-full h-24 bg-slate-900 border border-slate-850 rounded p-1.5 text-[10px] font-mono text-slate-300" />
-                    </div>
-
-                    <div className="bg-slate-900 p-2.5 rounded border border-slate-850 text-slate-400">
-                      <p className="font-semibold text-white text-[10px]">Próximas ações pós-recusa:</p>
-                      <p className="text-[10px] text-slate-400 mt-0.5">Notificar o interessado via e-mail ou SEI, atualizar o registro na planilha de demandas indeferidas e concluir o processo na unidade.</p>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
 
@@ -521,9 +356,9 @@ Fica o declarante ${process.requerente} cientificado de que a Declaração de Co
               </button>
               <button 
                 onClick={() => { handleSave(true); setActiveStep('finalizacao'); }}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition"
+                className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-2 rounded-lg transition"
               >
-                Ir para Finalização da DCF
+                Salvar e Ir para Finalização
               </button>
             </div>
           </div>
@@ -532,44 +367,25 @@ Fica o declarante ${process.requerente} cientificado de que a Declaração de Co
         {/* Step 4: Finalizacao */}
         {activeStep === 'finalizacao' && (
           <div className="space-y-4 text-xs">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider text-slate-300">Fechamento do Ciclo da DCF</h3>
-              <button 
-                onClick={generateFinalizacaoTexts}
-                className="bg-emerald-650/15 text-emerald-400 border border-emerald-500/20 px-3 py-1.5 rounded text-xs font-semibold"
-              >
-                Gerar Despachos de Fechamento (SIAM/CAF)
-              </button>
+            <div className="border-b border-slate-800 pb-2">
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider text-slate-300">Procedimento de Finalização no SEI</h3>
+              <p className="text-slate-400 text-xs">Instruções para encerramento técnico de DCF dentro do SEI:</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-300 font-semibold">1. Lançar Saldo no SIAM</span>
-                  <button onClick={() => handleCopyToClipboard(despachoSaldoSiam)} className="text-sky-400 hover:underline"><Copy size={10} /></button>
-                </div>
-                <textarea value={despachoSaldoSiam} readOnly className="w-full h-32 bg-slate-950 border border-slate-850 rounded p-1.5 font-mono text-[9px]" />
-              </div>
-
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-300 font-semibold">2. Homologar / Avaliar</span>
-                  <button onClick={() => handleCopyToClipboard(despachoAvaliacaoDcf)} className="text-sky-400 hover:underline"><Copy size={10} /></button>
-                </div>
-                <textarea value={despachoAvaliacaoDcf} readOnly className="w-full h-32 bg-slate-950 border border-slate-850 rounded p-1.5 font-mono text-[9px]" />
-              </div>
-
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-300 font-semibold">3. Intimação Eletrônica (Ciência)</span>
-                  <button onClick={() => handleCopyToClipboard(intimacaoEletronica)} className="text-sky-400 hover:underline"><Copy size={10} /></button>
-                </div>
-                <textarea value={intimacaoEletronica} readOnly className="w-full h-32 bg-slate-950 border border-slate-850 rounded p-1.5 font-mono text-[9px]" />
+            <div className="bg-slate-950 p-5 rounded-lg border border-slate-850 space-y-3">
+              <span className="font-semibold text-white block text-sm">Procedimento SIAM / CAF e SEI:</span>
+              <p className="text-slate-400 leading-relaxed">Quando o técnico concluir a análise, o processo estará disponível para finalização. Siga estes passos de documentos no SEI:</p>
+              
+              <div className="bg-slate-900/60 p-4 rounded border border-slate-800 space-y-3 text-slate-350">
+                <p><strong>1. Lançar Saldo no SIAM:</strong> Utilize o modelo favoritado <strong>"Despacho Lançamento de Saldo SIAM"</strong> ou <strong>"Despacho Não Homologação de Saldo"</strong> no SEI.</p>
+                <p><strong>2. Avaliação da DCF:</strong> Utilize o modelo favoritado <strong>"Despacho de Avaliação Técnica de DCF"</strong> no SEI.</p>
+                <p><strong>3. Intimação Eletrônica:</strong> DENTRO DO SEI HÁ MODELO PARA Intimação Eletrônica de Ciência ao declarante (fica em favoritos).</p>
+                <p><strong>4. Retorno de Unidade:</strong> Lembre-se de encaminhar de volta os processos pertencentes a Peçanha para a devida conclusão deles lá.</p>
               </div>
             </div>
 
             <div className="bg-slate-950 p-4 rounded-lg border border-slate-800 space-y-3">
-              <h4 className="font-semibold text-white">Checklist de encerramento da rotina:</h4>
+              <h4 className="font-semibold text-white">Checklist de encerramento local:</h4>
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
                   <input 
@@ -599,7 +415,7 @@ Fica o declarante ${process.requerente} cientificado de que a Declaração de Co
                     className="bg-slate-900 border border-slate-800 rounded px-1.5 py-0.5 text-white"
                   >
                     <option value="">Selecione o bloco</option>
-                    <option value="DCF finalizadas">DCF finalizadas</option>
+                    <option value="DCF- Declaração de Colheita de Florestas Plantadas e Produção de Carvão.">DCF- Declaração de Colheita de Florestas Plantadas e Produção de Carvão.</option>
                     <option value="Outros">Outros</option>
                   </select>
                 </div>

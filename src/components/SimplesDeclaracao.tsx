@@ -18,16 +18,12 @@ export const SimplesDeclaracao: React.FC<SimplesDeclaracaoProps> = ({ activeProc
 
   // Local component states
   const [conferidoDocumentos, setConferidoDocumentos] = useState(false);
-  const [memorandoTecnico, setMemorandoTecnico] = useState('');
-  const [intimacaoEletronica, setIntimacaoEletronica] = useState('');
   const [feedbackMsg, setFeedbackMsg] = useState('');
 
   // Sync state when process changes
   useEffect(() => {
     if (process && process.simplesData) {
       setConferidoDocumentos(process.simplesData.conferidoDocumentos);
-      setMemorandoTecnico(process.simplesData.memorandoTecnico || '');
-      setIntimacaoEletronica(process.simplesData.intimacaoEletronica || '');
       
       if (process.simplesData.etapa === 'Finalização') {
         setActiveStep('finalizacao');
@@ -58,10 +54,10 @@ export const SimplesDeclaracao: React.FC<SimplesDeclaracaoProps> = ({ activeProc
 
     updateProcess(activeProcessId, {
       simplesData: {
-        etapa: activeStep === 'conferencia' ? 'Conferência' : 'Finalização',
+        etapa: activeStep === 'conferencia' ? 'Entrada' : 'Finalização',
         conferidoDocumentos,
-        memorandoTecnico,
-        intimacaoEletronica
+        memorandoTecnico: '',
+        intimacaoEletronica: ''
       }
     });
 
@@ -69,37 +65,6 @@ export const SimplesDeclaracao: React.FC<SimplesDeclaracaoProps> = ({ activeProc
       setFeedbackMsg('Dados Simples Declaração salvos!');
       setTimeout(() => setFeedbackMsg(''), 2000);
     }
-  };
-
-  const generateTexts = () => {
-    const dataStr = new Date().toLocaleDateString('pt-BR');
-    const ano = new Date().getFullYear();
-
-    const memo = `MEMORANDO Nº ____/${ano} - ${settings.nomeUnidade}
-
-Para: Equipe de Vistoria Técnica
-Assunto: Solicitação de vistoria técnica - Simples Declaração
-Processo SEI: ${process.seiNumber}
-Interessado: ${process.requerente}
-
-1. Encaminhamos o presente processo de Simples Declaração referente à atividade no município de ${process.municipio} para vistoria in loco.
-2. Solicita-se a validação das coordenadas indicadas e lavratura do laudo de constatação de limites.
-
-Atenciosamente,
-___________________________
-${settings.servidorPadrao}`;
-
-    const intimacao = `INTIMAÇÃO ELETRÔNICA — CIÊNCIA DE SIMPLES DECLARAÇÃO
-
-Fica o declarante ${process.requerente} intimado da conclusão da análise da Simples Declaração sob o processo SEI nº ${process.seiNumber}. A atividade declarada encontra-se devidamente registrada perante este NAR Guanhães, nos termos do Decreto Estadual nº 47.749/2019.`;
-
-    setMemorandoTecnico(memo);
-    setIntimacaoEletronica(intimacao);
-  };
-
-  const handleCopyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    alert('Copiado para a área de transferência!');
   };
 
   const isFinalizedButInSpecial = process.isFinalized && process.emAcompanhamentoEspecial;
@@ -173,54 +138,47 @@ Fica o declarante ${process.requerente} intimado da conclusão da análise da Si
       <div className="bg-slate-900/30 border border-slate-800 p-5 rounded-xl text-xs space-y-4">
         {activeStep === 'conferencia' ? (
           <div className="space-y-4">
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider text-slate-300">Conferência Documental</h3>
+            <h3 className="text-sm font-bold text-white uppercase tracking-wider text-slate-350">Conferência Documental</h3>
             
             <div className="bg-slate-950 p-4 rounded-lg border border-slate-800 space-y-3">
-              <div className="flex items-center gap-2">
-                <input 
-                  type="checkbox" 
-                  id="chk-docs-simples" 
-                  checked={conferidoDocumentos}
-                  onChange={e => setConferidoDocumentos(e.target.checked)}
-                  className="w-4 h-4 rounded border-slate-800 bg-slate-900 accent-emerald-500"
-                />
-                <label htmlFor="chk-docs-simples" className="text-slate-300 font-semibold cursor-pointer">Documentos mínimos e formulário de Simples Declaração anexados e corretos</label>
+              <span className="font-semibold text-white block">Procedimento de Triagem de Simples Declaração</span>
+              <p className="text-slate-400">Verifique os documentos mínimos e realize a triagem local. No SEI, execute as ações necessárias utilizando os modelos oficiais:</p>
+              <div className="bg-slate-900/60 p-3.5 rounded border border-slate-800 text-slate-400 space-y-2">
+                <p><strong>DENTRO DO SEI HÁ MODELO PARA:</strong> Memorando de Vistoria Técnica / Distribuição de Simples Declaração (fica em favoritos).</p>
+                <p><strong>Diretriz de Fluxo:</strong> Encaminhe o processo para a análise do Paulo seguindo a organização proposta de distribuição.</p>
               </div>
             </div>
 
-            <div className="flex items-center justify-between border-t border-slate-800 pt-4">
-              <button 
-                onClick={generateTexts}
-                className="bg-sky-600 hover:bg-sky-500 text-white font-semibold px-4 py-2 rounded-lg transition"
-              >
-                Gerar Textos Operacionais
-              </button>
-              
-              {memorandoTecnico && (
-                <div className="flex gap-2">
-                  <button 
-                    onClick={() => handleCopyToClipboard(memorandoTecnico)}
-                    className="bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 px-3 py-1.5 rounded flex items-center gap-1.5 transition"
-                  >
-                    <Copy size={12} /> Copiar Memorando Técnico
-                  </button>
-                </div>
-              )}
+            <div className="flex items-center gap-2 mt-4 border-t border-slate-850 pt-3">
+              <input 
+                type="checkbox" 
+                id="chk-docs-simples" 
+                checked={conferidoDocumentos}
+                onChange={e => setConferidoDocumentos(e.target.checked)}
+                className="w-4 h-4 rounded border-slate-800 bg-slate-900 accent-emerald-500"
+              />
+              <label htmlFor="chk-docs-simples" className="text-slate-300 font-semibold cursor-pointer">Documentos mínimos e formulário de Simples Declaração anexados e corretos</label>
             </div>
 
-            {memorandoTecnico && (
-              <textarea 
-                value={memorandoTecnico} 
-                onChange={e => setMemorandoTecnico(e.target.value)}
-                className="w-full h-40 bg-slate-950 border border-slate-800 rounded-lg p-3 font-mono text-xs text-slate-300 focus:outline-none" 
-              />
-            )}
+            <div className="flex justify-end gap-2 border-t border-slate-800 pt-4">
+              <button 
+                onClick={() => { handleSave(true); setActiveStep('finalizacao'); }}
+                className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-2 rounded-lg transition cursor-pointer"
+              >
+                Salvar e Ir para Finalização
+              </button>
+            </div>
           </div>
         ) : (
           <div className="space-y-4">
             <h3 className="text-sm font-bold text-white uppercase tracking-wider text-slate-300">Conclusão e Intimação de Ciência</h3>
 
             <div className="bg-slate-950 p-4 rounded-lg border border-slate-850 space-y-4">
+              <div className="bg-slate-900/60 p-3.5 rounded border border-slate-800 text-slate-400 mb-2 space-y-1.5">
+                <p><strong>DENTRO DO SEI HÁ MODELO PARA:</strong> Intimação Eletrônica: Ciência (fica em favoritos).</p>
+                <p className="text-[11px] text-slate-400">Após o técnico finalizar a análise técnica da Simples Declaração, informe o despacho para o declarante através do modelo favoritado de Intimação Eletrônica de Ciência no SEI.</p>
+              </div>
+
               <div className="flex items-center gap-2">
                 <input 
                   type="checkbox" 
@@ -256,31 +214,23 @@ Fica o declarante ${process.requerente} intimado da conclusão da análise da Si
               </div>
             </div>
 
-            <div className="flex items-center justify-between border-t border-slate-800 pt-4">
+            <div className="flex justify-between border-t border-slate-800 pt-4">
               <button 
-                onClick={generateTexts}
-                className="bg-sky-600 hover:bg-sky-500 text-white font-semibold px-4 py-2 rounded-lg transition"
+                onClick={() => setActiveStep('conferencia')}
+                className="text-slate-400 hover:text-white"
               >
-                Gerar Intimação Ciência
+                Voltar
               </button>
-              
-              {intimacaoEletronica && (
-                <button 
-                  onClick={() => handleCopyToClipboard(intimacaoEletronica)}
-                  className="bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 px-3 py-1.5 rounded flex items-center gap-1.5 transition"
-                >
-                  <Copy size={12} /> Copiar Intimação
-                </button>
-              )}
+              <button 
+                onClick={() => {
+                  handleSave(true);
+                  onNavigate('Painel');
+                }}
+                className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-2 rounded-lg transition"
+              >
+                Finalizar e Voltar ao Painel
+              </button>
             </div>
-
-            {intimacaoEletronica && (
-              <textarea 
-                value={intimacaoEletronica} 
-                onChange={e => setIntimacaoEletronica(e.target.value)}
-                className="w-full h-40 bg-slate-950 border border-slate-800 rounded-lg p-3 font-mono text-xs text-slate-300 focus:outline-none" 
-              />
-            )}
           </div>
         )}
       </div>

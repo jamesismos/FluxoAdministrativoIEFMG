@@ -58,58 +58,7 @@ export const TaxasDAE: React.FC = () => {
     alert('DAE cadastrado com sucesso!');
   };
 
-  const handleGenerateTexts = (dae: TaxaRecord) => {
-    const dataStr = new Date().toLocaleDateString('pt-BR');
-    
-    const minuta = `DECLARAÇÃO DE DEVOLUÇÃO TRIBUTÁRIA / RESTITUIÇÃO
 
-1. Declara-se, para os fins de instrução de restituição nos termos da Resolução Conjunta SEMAD/IEF nº 1.914/2013, que o DAE nº ${dae.numeroDAE} (Valor: R$ ${dae.valor}) emitido em ${dae.dataEmissao} correspondente à Taxa de ${dae.tipoTaxa}:
-   - NÃO foi utilizado para formalização de processo no âmbito do NAR Guanhães;
-   - NÃO gerou o fato gerador da atividade administrativa requerida;
-   - Encontra-se passível de restituição de valores.
-2. Encaminhe-se à Secretaria de Estado de Fazenda (SEF) para as devidas providências de reembolso financeiro.
-
-${settings.nomeUnidade}, ${dataStr}.`;
-
-    const indef = `DESPACHO DE INDEFERIMENTO DE RESTITUIÇÃO
-
-Processo SEI: ${dae.processoVinculado}
-DAE: ${dae.numeroDAE}
-
-1. Trata-se de solicitação de restituição da taxa de ${dae.tipoTaxa}.
-2. INDEFIRO o pleito, tendo em vista que a análise do processo SEI nº ${dae.processoVinculado} já foi iniciada/realizada (fato gerador consumado), ou constatou-se que o referido DAE já foi vinculado e exaurido em outra formalização ambiental.
-
-NAR Guanhães, ${dataStr}.`;
-
-    const ofi = `OFÍCIO Nº ____/${new Date().getFullYear()} - ${settings.nomeUnidade}
-
-Ao Interessado,
-Assunto: Resposta ao pedido de restituição de taxa - DAE nº ${dae.numeroDAE}
-
-Prezado(a) Senhor(a),
-Informamos que seu pedido de restituição de taxas foi analisado perante este Núcleo de Apoio Regional de Guanhães. Nos termos da legislação vigente, o pedido foi classificado como: ${dae.situacao}. 
-${dae.situacao === 'Passível de restituição' ? 'Os autos foram encaminhados à SEF-MG para processamento do depósito.' : 'O pedido foi indeferido por fato gerador consumado.'}
-
-Atenciosamente,
-___________________________
-${settings.servidorPadrao}`;
-
-    const plan = `[PLANILHA ANOTAÇÃO]: DAE: ${dae.numeroDAE} | Tipo: ${dae.tipoTaxa} | Valor: ${dae.valor} | Situação: ${dae.situacao} | Data de Análise: ${dataStr}.`;
-
-    updateTaxaRecord(dae.id, {
-      minutaDeclaracao: minuta,
-      minutaIndeferimento: indef,
-      oficioInteressado: ofi,
-      anotacaoPlanilha: plan
-    });
-
-    alert('Documentos operacionais gerados!');
-  };
-
-  const handleCopyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    alert('Copiado para a área de transferência!');
-  };
 
   return (
     <div className="space-y-6">
@@ -262,54 +211,19 @@ ${settings.servidorPadrao}`;
           {/* Details / Document Generation */}
           {activeDae && (
             <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-xl space-y-4 text-xs">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                <div>
-                  <h3 className="font-bold text-white">Análise do DAE: {activeDae.numeroDAE}</h3>
-                  <p className="text-slate-400 text-[10px]">Utilize os botões abaixo para gerar e copiar as minutas de despacho.</p>
-                </div>
-                <button 
-                  onClick={() => handleGenerateTexts(activeDae)}
-                  className="bg-sky-600 hover:bg-sky-500 text-white font-semibold px-3 py-1 rounded transition"
-                >
-                  Elaborar Minutas SEI
-                </button>
+              <div className="border-b border-slate-800 pb-2">
+                <h3 className="font-bold text-white text-sm">Procedimento SEI para DAE: {activeDae.numeroDAE}</h3>
+                <p className="text-slate-400 text-[10px]">Orientações para lavratura da restituição ou indeferimento no SEI.</p>
               </div>
 
-              {activeDae.minutaDeclaracao && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold text-slate-300">Minuta de Devolução (Res. 1914)</span>
-                      <button onClick={() => handleCopyToClipboard(activeDae.minutaDeclaracao)} className="text-sky-400 hover:underline"><Copy size={11} /></button>
-                    </div>
-                    <textarea readOnly value={activeDae.minutaDeclaracao} className="w-full h-32 bg-slate-950 border border-slate-850 rounded p-1.5 font-mono text-[9px]" />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold text-slate-300">Minuta de Indeferimento</span>
-                      <button onClick={() => handleCopyToClipboard(activeDae.minutaIndeferimento)} className="text-sky-400 hover:underline"><Copy size={11} /></button>
-                    </div>
-                    <textarea readOnly value={activeDae.minutaIndeferimento} className="w-full h-32 bg-slate-950 border border-slate-850 rounded p-1.5 font-mono text-[9px]" />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold text-slate-300">Ofício ao Interessado</span>
-                      <button onClick={() => handleCopyToClipboard(activeDae.oficioInteressado)} className="text-sky-400 hover:underline"><Copy size={11} /></button>
-                    </div>
-                    <textarea readOnly value={activeDae.oficioInteressado} className="w-full h-32 bg-slate-950 border border-slate-850 rounded p-1.5 font-mono text-[9px]" />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold text-slate-300">Anotação Planilha Local</span>
-                      <button onClick={() => handleCopyToClipboard(activeDae.anotacaoPlanilha)} className="text-sky-400 hover:underline"><Copy size={11} /></button>
-                    </div>
-                    <textarea readOnly value={activeDae.anotacaoPlanilha} className="w-full h-32 bg-slate-950 border border-slate-850 rounded p-1.5 font-mono text-[9px]" />
-                  </div>
+              <div className="bg-slate-950 p-4 rounded-lg border border-slate-850 space-y-3">
+                <p className="text-slate-300 font-semibold">Instruções de Processo Administrativo:</p>
+                <div className="bg-slate-900/60 p-3.5 rounded border border-slate-800 text-slate-400 space-y-2">
+                  <p><strong>Para Restituição Deferida:</strong> DENTRO DO SEI HÁ MODELO PARA Declaração de Devolução Tributária - Res. 1914 (fica em favoritos). Complete as informações do DAE nº {activeDae.numeroDAE} (Valor: R$ {activeDae.valor.toFixed(2)}) e do interessado correspondente ao processo {activeDae.processoVinculado}.</p>
+                  <p><strong>Para Restituição Indeferida:</strong> DENTRO DO SEI HÁ MODELO PARA Despacho de Indeferimento de Restituição (fica em favoritos) e modelo de <strong>Ofício de Notificação de Indeferimento</strong>.</p>
+                  <p><strong>Planilha Local:</strong> Lembre-se de lançar a demanda no <strong>Controle Processos NAR e Aflobios</strong> para o acompanhamento estatístico mensal.</p>
                 </div>
-              )}
+              </div>
             </div>
           )}
         </div>
