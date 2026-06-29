@@ -108,7 +108,7 @@ const initialSettings: SystemSettings = {
   chefiaObservacoesPadrao: 'Orientação geral: conferir se shapes e CAR batem com limites da propriedade no cadastro do SIAM.',
   municipiosGuanhaes: initialMunicipalitiesGuanhaes,
   municipiosAflobioPecanha: initialMunicipalitiesAflobio,
-  responsaveisTecnicos: ['Carlos (Técnico IEF)', 'Ana (Analista Ambiental)', 'Felipe (Eng. Florestal)', 'Juliana (Bióloga)']
+  responsaveisTecnicos: []
 };
 
 const defaultAiaChecklist = (): ChecklistItem[] => [
@@ -133,105 +133,7 @@ const defaultAiaChecklist = (): ChecklistItem[] => [
   { id: '19', category: 'Geral', description: 'Recibo do SINAFLOR (quando couber)', status: 'A VERIFICAR', docVinculado: '', observacao: '' }
 ];
 
-const initialProcesses = (): Process[] => [
-  {
-    id: 'p1',
-    seiNumber: '1370.01.0023456/2026-89',
-    type: 'AIA',
-    municipio: 'Guanhães',
-    requerente: 'Fazenda Santa Rita Ltda',
-    dataEntrada: '2026-06-15',
-    unidadeAtual: 'IEF/NAR Guanhães',
-    responsavelInterno: 'James',
-    situacao: 'Aguardando conferência preliminar',
-    proximaAcao: 'Realizar triagem de documentos e checklist',
-    validacaoChefia: 'Aguardando chefia',
-    chefiaOrientacao: 'Verificar se o KMZ está na poligonal exata da reserva legal averbada.',
-    emAcompanhamentoEspecial: true,
-    acompanhamentoTipo: 'Intervenção Ambiental',
-    blocoInterno: '',
-    isFinalized: false,
-    createdAt: new Date(Date.now() - 5000000).toISOString(),
-    aiaData: {
-      intervencoes: [
-        'Supressão de cobertura vegetal nativa para uso alternativo do solo',
-        'Intervenção com supressão em APP'
-      ],
-      documentosColados: `Requerimento de Intervenção Ambiental (141233287)\nIdentidade do Requerente (141233288)\nComprovante de Endereço (141233289)\nMatrícula do Imóvel (141233290)\nRecibo CAR (141233291)\nShapefile da área de intervenção (141233292)\nKMZ (141233293)\nProjeto de Intervenção Ambiental - PIA (141233294)\nEstudo de alternativa locacional APP (141233295)\nDAE Expediente pago (141233296)\nComprovante de pagamento DAE (141233297)`,
-      checklist: [
-        { id: '01', category: 'Geral', description: 'Requerimento para intervenção ambiental assinado', status: 'SIM', docVinculado: 'Requerimento (141233287)', observacao: 'Assinado pelo SEI' },
-        { id: '02', category: 'Geral', description: 'Identificação do responsável/empreendedor e comprovante de endereço', status: 'SIM', docVinculado: 'Identidade (141233288) / Comprovante (141233289)', observacao: 'Ok' },
-        { id: '03', category: 'Geral', description: 'Identificação do proprietário/possuidor e comprovante de endereço', status: 'SIM', docVinculado: 'Identidade (141233288) / Comprovante (141233289)', observacao: 'Ok' },
-        { id: '04', category: 'Geral', description: 'Procuração (quando for o caso)', status: 'NÃO SE APLICA', docVinculado: '', observacao: 'Requerente é o proprietário' },
-        { id: '05', category: 'Geral', description: 'Documento de comprovação da posse ou propriedade do imóvel', status: 'SIM', docVinculado: 'Matrícula (141233290)', observacao: 'Matrícula atualizada (menos de 90 dias)' },
-        { id: '06', category: 'Geral', description: 'Recibo de inscrição no Cadastro Ambiental Rural (CAR) ativo', status: 'SIM', docVinculado: 'Recibo CAR (141233291)', observacao: 'Situação: ativo' },
-        { id: '07', category: 'Geral', description: 'Contrato/Anuência quando o requerente não for o proprietário', status: 'NÃO SE APLICA', docVinculado: '', observacao: '' },
-        { id: '08', category: 'Geral', description: 'Carta de anuência dos demais proprietários (se condomínio)', status: 'NÃO SE APLICA', docVinculado: '', observacao: '' },
-        { id: '09', category: 'Geral', description: 'Planta topográfica ou Croqui com coordenadas da área do imóvel', status: 'SIM', docVinculado: 'Contido no PIA (141233294)', observacao: 'Área com croqui aceitável' },
-        { id: '10', category: 'Geral', description: 'Arquivos digitais vetoriais de localização (.KMZ / Shapefile)', status: 'SIM', docVinculado: 'Shapefile (141233292) / KMZ (141233293)', observacao: 'SIGA-MG validou' },
-        { id: '11', category: 'Geral', description: 'Projeto de Intervenção Ambiental (PIA) ou Simplificado (PIAS)', status: 'SIM', docVinculado: 'PIA (141233294)', observacao: 'Com ART recolhida' },
-        { id: '12', category: 'Geral', description: 'Proposta de Medidas Compensatórias (quando cabível)', status: 'A VERIFICAR', docVinculado: '', observacao: 'Falta proposta expressa ou anotação no PIA' },
-        { id: '13', category: 'Geral', description: 'Projeto de compensação florestal Lei 13.047/1998 (se bioma Cerrado)', status: 'NÃO SE APLICA', docVinculado: '', observacao: 'Área de Mata Atlântica' },
-        { id: '14', category: 'Geral', description: 'DAE devidamente pago - Taxa de Expediente', status: 'SIM', docVinculado: 'DAE (141233296) / Comprovante (141233297)', observacao: 'Valor R$ 254,10 quitado' },
-        { id: '15', category: 'Geral', description: 'DAE devidamente pago - Taxa Florestal (se houver aproveitamento)', status: 'NÃO SE APLICA', docVinculado: '', observacao: 'Não haverá aproveitamento de material lenhoso comercial' },
-        { id: '16', category: 'Geral', description: 'Estudos e relatórios de fauna silvestre (inventariamento)', status: 'NÃO SE APLICA', docVinculado: '', observacao: '' },
-        { id: '17', category: 'Geral', description: 'Autorizações de resgate, salvamento e destinação de fauna', status: 'NÃO SE APLICA', docVinculado: '', observacao: '' },
-        { id: '18', category: 'Geral', description: 'Comprovante de Cadastro no CAF (Cadastro de Consumidores de Matéria-Prima)', status: 'NÃO SE APLICA', docVinculado: '', observacao: '' },
-        { id: '19', category: 'Geral', description: 'Recibo do SINAFLOR (quando couber)', status: 'A VERIFICAR', docVinculado: '', observacao: 'Pendente verificar no sistema nacional' }
-      ],
-      pendenciasText: '',
-      despachoGerado: '',
-      memorandoGerado: ''
-    }
-  },
-  {
-    id: 'p2',
-    seiNumber: '1370.01.0098765/2026-11',
-    type: 'DCF',
-    municipio: 'Coroaci',
-    requerente: 'Geraldo Custódio de Oliveira',
-    dataEntrada: '2026-06-20',
-    unidadeAtual: 'IEF/NAR Guanhães',
-    responsavelInterno: 'James',
-    situacao: 'Aguardando envio para AFLOBIO Peçanha',
-    proximaAcao: 'AFLOBIO Peçanha atende Coroaci para DCF. Encaminhar no SEI.',
-    validacaoChefia: 'Validado pela chefia',
-    chefiaOrientacao: 'Município pertence à AFLOBIO Peçanha para DCF. Pode encaminhar para o NUREG/AFLOBIO.',
-    chefiaDataValidacao: '2026-06-22',
-    chefiaResponsavelProximaAcao: 'James',
-    emAcompanhamentoEspecial: true,
-    acompanhamentoTipo: 'DCFs Ativas',
-    blocoInterno: '',
-    isFinalized: false,
-    createdAt: new Date(Date.now() - 2000000).toISOString(),
-    dcfData: {
-      etapa: 'Conferência',
-      isApta: true,
-      municipioAflobioPecanha: true,
-      conferidoFormulario: true,
-      conferidoArquivosDigitais: true,
-      conferidoCadastroPlantio: true,
-      conferidoDaeTaxaFlorestal: true,
-      conferidoDaeExpediente: true,
-      conferidoComprovantes: true,
-      conferidoTermoCiencia: true,
-      conferidoPlanilhaColheita: true,
-      produtoDeclarado: 'Eucalipto - Lenha',
-      volumeDeclarado: 450,
-      correspondeTaxaVolume: true,
-      termoConcordanciaOutroProprietario: false,
-      daeAnoAnterior: false,
-      pagamentoSiteFazendaConfirmado: true,
-      despachoAceite: '',
-      memorandoTecnico: '',
-      despachoRecusa: '',
-      comunicacaoRecusa: '',
-      despachoSaldoSiam: '',
-      despachoAvaliacaoDcf: '',
-      intimacaoEletronica: ''
-    }
-  }
-];
+const initialProcesses = (): Process[] => [];
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [processes, setProcesses] = useState<Process[]>([]);
