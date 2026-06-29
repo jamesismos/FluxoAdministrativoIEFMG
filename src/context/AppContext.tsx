@@ -145,14 +145,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Load data from localStorage
   useEffect(() => {
     try {
-      const storedProcesses = localStorage.getItem('narflow_v3_processes');
-      const storedAsv = localStorage.getItem('narflow_v3_asv');
-      const storedTaxas = localStorage.getItem('narflow_v3_taxas');
-      const storedNormatives = localStorage.getItem('narflow_v3_normatives');
-      const storedSettings = localStorage.getItem('narflow_v3_settings');
+      const storedProcesses = localStorage.getItem('narflow_v4_processes');
+      const storedAsv = localStorage.getItem('narflow_v4_asv');
+      const storedTaxas = localStorage.getItem('narflow_v4_taxas');
+      const storedNormatives = localStorage.getItem('narflow_v4_normatives');
+      const storedSettings = localStorage.getItem('narflow_v4_settings');
 
-      if (storedProcesses) setProcesses(JSON.parse(storedProcesses));
-      else setProcesses(initialProcesses());
+      if (storedProcesses) {
+        const parsed = JSON.parse(storedProcesses) as Process[];
+        const filtered = parsed.filter(
+          p => p.id !== 'p1' && 
+               p.id !== 'p2' && 
+               !p.requerente.toLowerCase().includes('santa rita') && 
+               !p.requerente.toLowerCase().includes('geraldo')
+        );
+        setProcesses(filtered);
+      } else {
+        setProcesses(initialProcesses());
+      }
 
       if (storedAsv) setAsvRecords(JSON.parse(storedAsv));
       else setAsvRecords([]);
@@ -174,27 +184,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Save data to localStorage
   useEffect(() => {
     if (!isLoaded) return;
-    localStorage.setItem('narflow_v3_processes', JSON.stringify(processes));
+    localStorage.setItem('narflow_v4_processes', JSON.stringify(processes));
   }, [processes, isLoaded]);
 
   useEffect(() => {
     if (!isLoaded) return;
-    localStorage.setItem('narflow_v3_asv', JSON.stringify(asvRecords));
+    localStorage.setItem('narflow_v4_asv', JSON.stringify(asvRecords));
   }, [asvRecords, isLoaded]);
 
   useEffect(() => {
     if (!isLoaded) return;
-    localStorage.setItem('narflow_v3_taxas', JSON.stringify(taxaRecords));
+    localStorage.setItem('narflow_v4_taxas', JSON.stringify(taxaRecords));
   }, [taxaRecords, isLoaded]);
 
   useEffect(() => {
     if (!isLoaded) return;
-    localStorage.setItem('narflow_v3_normatives', JSON.stringify(normatives));
+    localStorage.setItem('narflow_v4_normatives', JSON.stringify(normatives));
   }, [normatives, isLoaded]);
 
   useEffect(() => {
     if (!isLoaded) return;
-    localStorage.setItem('narflow_v3_settings', JSON.stringify(settings));
+    localStorage.setItem('narflow_v4_settings', JSON.stringify(settings));
   }, [settings, isLoaded]);
 
   // Methods
