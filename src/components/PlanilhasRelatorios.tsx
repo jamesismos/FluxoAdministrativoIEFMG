@@ -3,10 +3,10 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
 import { Process } from '../types';
-import { FileSpreadsheet, Download, Copy, Eye, FileText } from 'lucide-react';
+import { FileSpreadsheet, Download, Copy, Eye, FileText, Trash2 } from 'lucide-react';
 
 export const PlanilhasRelatorios: React.FC = () => {
-  const { processes } = useApp();
+  const { processes, deleteProcess } = useApp();
 
   // Helper groupings
   const byType = processes.reduce((acc, p) => {
@@ -173,7 +173,8 @@ export const PlanilhasRelatorios: React.FC = () => {
                 <th className="py-2 px-2">Requerente</th>
                 <th className="py-2 px-2">Município</th>
                 <th className="py-2 px-2">Situação Atual</th>
-                <th className="py-2 pl-2 text-right">Status</th>
+                <th className="py-2 px-2 text-right">Status</th>
+                <th className="py-2 pl-2 text-right">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-850">
@@ -184,10 +185,24 @@ export const PlanilhasRelatorios: React.FC = () => {
                   <td className="py-2.5 px-2 text-slate-300">{p.requerente}</td>
                   <td className="py-2.5 px-2 text-slate-300">{p.municipio}</td>
                   <td className="py-2.5 px-2 text-slate-400">{p.situacao}</td>
-                  <td className="py-2.5 pl-2 text-right">
+                  <td className="py-2.5 px-2 text-right">
                     <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${p.isFinalized ? 'bg-emerald-950 text-emerald-400' : 'bg-amber-950 text-amber-400'}`}>
                       {p.isFinalized ? 'Finalizado' : 'Ativo'}
                     </span>
+                  </td>
+                  <td className="py-2.5 pl-2 text-right">
+                    <button 
+                      onClick={() => {
+                        if (confirm('Deseja realmente EXCLUIR este processo?')) {
+                          deleteProcess(p.id);
+                          alert('Processo excluído com sucesso!');
+                        }
+                      }}
+                      className="text-slate-500 hover:text-red-400 p-1"
+                      title="Excluir"
+                    >
+                      <Trash2 size={13} />
+                    </button>
                   </td>
                 </tr>
               ))}

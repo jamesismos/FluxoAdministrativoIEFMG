@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { Process, ChecklistItem } from '../types';
-import { FileText, Clipboard, Check, AlertCircle, RefreshCw, Copy, Save, CheckSquare } from 'lucide-react';
+import { FileText, Clipboard, Check, AlertCircle, RefreshCw, Copy, Save, CheckSquare, Trash2 } from 'lucide-react';
 
 interface AiaProps {
   activeProcessId: string | null;
@@ -11,7 +11,7 @@ interface AiaProps {
 }
 
 export const Aia: React.FC<AiaProps> = ({ activeProcessId, onNavigate }) => {
-  const { processes, updateProcess, settings } = useApp();
+  const { processes, updateProcess, deleteProcess, settings } = useApp();
   const [subTab, setSubTab] = useState<'geral' | 'docs' | 'checklist' | 'pendencias' | 'despacho' | 'memorando' | 'acompanhamento' | 'finalizacao'>('geral');
 
   // Load the current active process
@@ -259,10 +259,23 @@ ${settings.nomeUnidade}`;
           {feedbackMsg && <span className="text-emerald-400 text-xs font-semibold mr-2">{feedbackMsg}</span>}
           <button 
             onClick={() => handleSave()}
-            className="bg-slate-900 hover:bg-slate-800 text-white border border-slate-700 text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition"
+            className="bg-slate-900 hover:bg-slate-800 text-white border border-slate-700 text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition cursor-pointer"
           >
             <Save size={14} />
             Salvar Alterações
+          </button>
+          <button 
+            onClick={() => {
+              if (confirm('Deseja realmente EXCLUIR este processo? Esta ação é definitiva e apagará todos os dados locais deste feito.')) {
+                deleteProcess(process.id);
+                alert('Processo excluído com sucesso!');
+                onNavigate('Painel');
+              }
+            }}
+            className="bg-red-955/20 hover:bg-red-900/40 text-red-400 border border-red-800/30 text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition cursor-pointer"
+          >
+            <Trash2 size={14} />
+            Excluir
           </button>
         </div>
       </div>
