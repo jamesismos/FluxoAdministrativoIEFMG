@@ -3,14 +3,14 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
 import { Process } from '../types';
-import { AlertCircle, Clock, CheckCircle2, FileText, UserCheck, ShieldAlert, Award, FileSpreadsheet } from 'lucide-react';
+import { AlertCircle, Clock, CheckCircle2, FileText, UserCheck, ShieldAlert, Award, FileSpreadsheet, Trash2 } from 'lucide-react';
 
 interface DashboardProps {
   onNavigate: (tab: string, processId?: string) => void;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
-  const { processes, settings } = useApp();
+  const { processes, deleteProcess, settings } = useApp();
 
   // Metrics calculation
   const newProcesses = processes.filter(p => p.situacao.toLowerCase().includes('novo') || p.situacao.toLowerCase().includes('criado'));
@@ -163,12 +163,26 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   <p className="text-slate-300 text-xs">Município: <span className="font-semibold">{p.municipio}</span> | Tipo: <span className="font-semibold">{p.type}</span> | Data entrada: <span className="font-mono">{p.dataEntrada}</span></p>
                   <p className="text-slate-400 text-xs">Próxima ação: <span className="text-yellow-400">{p.proximaAcao}</span></p>
                 </div>
-                <button 
-                  onClick={() => onNavigate(p.type === 'AIA' ? 'AIA — Intervenção Ambiental' : p.type === 'DCF' ? 'DCF' : 'Simples Declaração', p.id)}
-                  className="bg-slate-800 hover:bg-slate-700 text-white text-xs px-3 py-1.5 rounded-lg border border-slate-700 transition self-start md:self-auto font-medium"
-                >
-                  Abrir Fluxo
-                </button>
+                <div className="flex gap-2 shrink-0">
+                  <button 
+                    onClick={() => onNavigate(p.type === 'AIA' ? 'AIA — Intervenção Ambiental' : p.type === 'DCF' ? 'DCF' : 'Simples Declaração', p.id)}
+                    className="bg-slate-800 hover:bg-slate-700 text-white text-xs px-3 py-1.5 rounded-lg border border-slate-700 transition self-start md:self-auto font-medium cursor-pointer"
+                  >
+                    Abrir Fluxo
+                  </button>
+                  <button 
+                    onClick={() => {
+                      if (confirm('Deseja realmente EXCLUIR este processo?')) {
+                        deleteProcess(p.id);
+                        alert('Processo excluído com sucesso!');
+                      }
+                    }}
+                    className="bg-red-955/20 hover:bg-red-900/40 text-red-400 border border-red-800/30 text-xs px-3 py-1.5 rounded-lg transition cursor-pointer"
+                    title="Excluir"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
               </div>
             ))}
 
@@ -186,12 +200,26 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   </div>
                   <p className="text-slate-300 text-xs">Alerta de fluxo: <span className="text-amber-300">Processo finalizado não deve ficar em acompanhamento especial. Inserir em bloco interno e concluir.</span></p>
                 </div>
-                <button 
-                  onClick={() => onNavigate('Acompanhamentos e Blocos')}
-                  className="bg-slate-800 hover:bg-slate-700 text-white text-xs px-3 py-1.5 rounded-lg border border-slate-700 transition self-start md:self-auto font-medium"
-                >
-                  Ir para Blocos
-                </button>
+                <div className="flex gap-2 shrink-0">
+                  <button 
+                    onClick={() => onNavigate('Acompanhamentos e Blocos')}
+                    className="bg-slate-800 hover:bg-slate-700 text-white text-xs px-3 py-1.5 rounded-lg border border-slate-700 transition self-start md:self-auto font-medium cursor-pointer"
+                  >
+                    Ir para Blocos
+                  </button>
+                  <button 
+                    onClick={() => {
+                      if (confirm('Deseja realmente EXCLUIR este processo?')) {
+                        deleteProcess(p.id);
+                        alert('Processo excluído com sucesso!');
+                      }
+                    }}
+                    className="bg-red-955/20 hover:bg-red-900/40 text-red-400 border border-red-800/30 text-xs px-3 py-1.5 rounded-lg transition cursor-pointer"
+                    title="Excluir"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
               </div>
             ))}
 
@@ -212,12 +240,26 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                     <p className="text-slate-400 text-xs italic bg-slate-900/60 p-1.5 rounded border border-slate-800 mt-1">Orientação da Chefia ({settings.chefiaNome}): {p.chefiaOrientacao}</p>
                   )}
                 </div>
-                <button 
-                  onClick={() => onNavigate(p.type === 'AIA' ? 'AIA — Intervenção Ambiental' : p.type === 'DCF' ? 'DCF' : 'Simples Declaração', p.id)}
-                  className="bg-slate-800 hover:bg-slate-700 text-white text-xs px-3 py-1.5 rounded-lg border border-slate-700 transition self-start md:self-auto font-medium"
-                >
-                  Gerenciar
-                </button>
+                <div className="flex gap-2 shrink-0">
+                  <button 
+                    onClick={() => onNavigate(p.type === 'AIA' ? 'AIA — Intervenção Ambiental' : p.type === 'DCF' ? 'DCF' : 'Simples Declaração', p.id)}
+                    className="bg-slate-800 hover:bg-slate-700 text-white text-xs px-3 py-1.5 rounded-lg border border-slate-700 transition self-start md:self-auto font-medium cursor-pointer"
+                  >
+                    Gerenciar
+                  </button>
+                  <button 
+                    onClick={() => {
+                      if (confirm('Deseja realmente EXCLUIR este processo?')) {
+                        deleteProcess(p.id);
+                        alert('Processo excluído com sucesso!');
+                      }
+                    }}
+                    className="bg-red-955/20 hover:bg-red-900/40 text-red-400 border border-red-800/30 text-xs px-3 py-1.5 rounded-lg transition cursor-pointer"
+                    title="Excluir"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
