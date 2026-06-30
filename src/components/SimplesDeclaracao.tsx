@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { FileText, Save, Trash2, PlusCircle, Clock, CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react';
+import { FileText, Save, Trash2, PlusCircle, Clock, CheckCircle2, ChevronDown, ChevronUp, Calendar } from 'lucide-react';
 
 interface SimplesDeclaracaoProps {
   activeProcessId: string | null;
@@ -37,10 +37,12 @@ function PhaseHeader({ num, label, done, total, collapsed, onToggle }: {
     <button onClick={onToggle} className="w-full flex items-center gap-3 text-left py-2.5 px-4 hover:bg-slate-800/20 transition">
       <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
         isComplete ? 'bg-emerald-600 text-white' : done > 0 ? 'bg-slate-700 text-amber-300' : 'bg-slate-800 text-slate-500'
-      }`}>{isComplete ? '\u2713' : num}</span>
+      }`}>
+        {isComplete ? '✓' : num}
+      </span>
       <div className="flex-1 min-w-0">
         <span className={`text-xs font-bold uppercase tracking-wider ${isComplete ? 'text-emerald-400' : 'text-slate-300'}`}>
-          Fase {num} \u2014 {label}
+          Fase {num} — {label}
         </span>
         <span className="text-slate-600 text-[10px] ml-2">({done}/{total})</span>
       </div>
@@ -61,20 +63,24 @@ export const SimplesDeclaracao: React.FC<SimplesDeclaracaoProps> = ({ activeProc
     analiseTecnicaConcluida: false,
     intimacaoEletronicaCriada: false,
   });
+  const [dataFormalizacao, setDataFormalizacao] = useState('');
   const [feedbackMsg, setFeedbackMsg] = useState('');
   const [collapsed, setCollapsed] = useState<Record<number, boolean>>({ 1: false, 2: false, 3: false });
 
   useEffect(() => {
-    if (process?.simplesData) {
-      const d = process.simplesData;
-      setFlow({
-        conferidoDocumentos: d.conferidoDocumentos ?? false,
-        memorandoAnalistaCriado: d.memorandoAnalistaCriado ?? false,
-        analiseTecnicaConcluida: d.analiseTecnicaConcluida ?? false,
-        intimacaoEletronicaCriada: d.intimacaoEletronicaCriada ?? false,
-      });
+    if (process) {
+      setDataFormalizacao(process.dataFormalizacao || '');
+      if (process.simplesData) {
+        const d = process.simplesData;
+        setFlow({
+          conferidoDocumentos: d.conferidoDocumentos ?? false,
+          memorandoAnalistaCriado: d.memorandoAnalistaCriado ?? false,
+          analiseTecnicaConcluida: d.analiseTecnicaConcluida ?? false,
+          intimacaoEletronicaCriada: d.intimacaoEletronicaCriada ?? false,
+        });
+      }
     }
-  }, [activeProcessId, process?.simplesData]);
+  }, [activeProcessId, process, process?.simplesData, process?.dataFormalizacao]);
 
   // LISTA
   if (!process) {
@@ -149,8 +155,8 @@ export const SimplesDeclaracao: React.FC<SimplesDeclaracaoProps> = ({ activeProc
 
   // FLUXO
   const derivaEtapa = (f: Record<string, boolean>) => {
-    if (f.intimacaoEletronicaCriada) return 'Finaliza\u00e7\u00e3o' as const;
-    if (f.memorandoAnalistaCriado) return 'Confer\u00eancia' as const;
+    if (f.intimacaoEletronicaCriada) return 'Finalização' as const;
+    if (f.memorandoAnalistaCriado) return 'Conferência' as const;
     return 'Entrada' as const;
   };
 
@@ -159,6 +165,7 @@ export const SimplesDeclaracao: React.FC<SimplesDeclaracaoProps> = ({ activeProc
     setFlow(newFlow);
     if (activeProcessId && process.simplesData) {
       updateProcess(activeProcessId, {
+        dataFormalizacao,
         simplesData: {
           ...process.simplesData,
           ...newFlow,
@@ -171,6 +178,7 @@ export const SimplesDeclaracao: React.FC<SimplesDeclaracaoProps> = ({ activeProc
   const handleSave = () => {
     if (!activeProcessId || !process.simplesData) return;
     updateProcess(activeProcessId, {
+      dataFormalizacao,
       simplesData: { ...process.simplesData, ...flow, etapa: derivaEtapa(flow) }
     });
     setFeedbackMsg('Salvo!');
@@ -196,7 +204,7 @@ export const SimplesDeclaracao: React.FC<SimplesDeclaracaoProps> = ({ activeProc
           <div className="flex items-center gap-2 flex-wrap">
             <span className={`text-xs px-2 py-0.5 rounded font-bold border ${
               process.isFinalized ? 'bg-slate-700/30 text-slate-400 border-slate-700/30' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-            }`}>Simples Declara\u00e7\u00e3o {process.isFinalized ? '\u2014 Finalizado' : '\u2014 Ativo'}</span>
+            }`}>Simples Declaração {process.isFinalized ? '— Finalizado' : '— Ativo'}</span>
             <h1 className="text-xl font-bold text-white font-mono">{process.seiNumber}</h1>
             {dias > 20 && !process.isFinalized && (
               <span className="bg-red-500/20 text-red-400 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase flex items-center gap-1">
@@ -204,7 +212,7 @@ export const SimplesDeclaracao: React.FC<SimplesDeclaracaoProps> = ({ activeProc
               </span>
             )}
           </div>
-          <p className="text-slate-400 text-xs mt-1">{process.requerente} \u00b7 {process.municipio} \u00b7 Entrada: <span className="font-mono">{process.dataEntrada}</span></p>
+          <p className="text-slate-400 text-xs mt-1">{process.requerente} · {process.municipio} · Entrada: <span className="font-mono">{process.dataEntrada}</span></p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {feedbackMsg && <span className="text-emerald-400 text-xs font-semibold">{feedbackMsg}</span>}
@@ -215,6 +223,37 @@ export const SimplesDeclaracao: React.FC<SimplesDeclaracaoProps> = ({ activeProc
             className="bg-red-950/20 hover:bg-red-900/40 text-red-400 border border-red-800/30 text-xs px-3 py-1.5 rounded-lg transition cursor-pointer">
             <Trash2 size={14} />
           </button>
+        </div>
+      </div>
+
+      {/* Formalização & Prazo Legal */}
+      <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center gap-4">
+        <div className="flex items-center gap-2.5">
+          <Calendar className="text-sky-400 shrink-0" size={20} />
+          <div>
+            <p className="text-xs font-bold text-sky-300 uppercase tracking-wider">Formalização / Aceite</p>
+            <p className="text-[10px] text-slate-450 mt-0.5">O prazo legal de análise (30 dias) inicia-se a partir desta data</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 md:ml-auto">
+          <input
+            type="date"
+            value={dataFormalizacao}
+            onChange={e => {
+              setDataFormalizacao(e.target.value);
+              updateProcess(process.id, { dataFormalizacao: e.target.value });
+            }}
+            className="bg-slate-950 border border-slate-850 rounded-lg px-3 py-1.5 text-white font-mono text-xs focus:outline-none focus:border-emerald-500"
+          />
+          {dataFormalizacao ? (
+            <span className="text-slate-400 text-xs font-semibold">
+              Formalizado há <span className="text-emerald-400 font-bold">{Math.ceil((Date.now() - new Date(dataFormalizacao).getTime()) / 86400000)}</span> dias
+            </span>
+          ) : (
+            <span className="text-amber-400 text-[10px] font-bold bg-amber-950/20 px-2 py-0.5 rounded border border-amber-900/30">
+              Aguardando Formalização (Triagem)
+            </span>
+          )}
         </div>
       </div>
 

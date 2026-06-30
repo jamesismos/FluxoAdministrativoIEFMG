@@ -89,6 +89,7 @@ export interface Process {
   municipio: string;
   requerente: string;
   dataEntrada: string;
+  dataFormalizacao?: string;
   unidadeAtual: string;
   responsavelInterno: string;
   situacao: string;

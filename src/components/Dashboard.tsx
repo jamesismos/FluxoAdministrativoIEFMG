@@ -201,11 +201,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
         );
         const dcfSdAtrasados30 = processes.filter(p =>
           (p.type === 'DCF' || p.type === 'Simples Declaração') &&
-          !p.isFinalized && diffDias(p.dataEntrada) > 30
+          !p.isFinalized && p.dataFormalizacao && diffDias(p.dataFormalizacao) > 30
         );
         const aiasAtrasadas180 = processes.filter(p =>
           p.type === 'AIA' &&
-          !p.isFinalized && diffDias(p.dataEntrada) > 180
+          !p.isFinalized && p.dataFormalizacao && diffDias(p.dataFormalizacao) > 180
         );
         const hasAlerts = aiasSemTriagem.length > 0 || 
                           aiasContagemAlerta.length > 0 || 
@@ -223,15 +223,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-[10px]">
               <div className="bg-slate-950/60 p-2 rounded border border-slate-800 text-slate-400">
                 <strong className="text-slate-300 block">DCF & Simples Declaração</strong>
-                Prazo legal de 30 dias para conclusão — Lei 14.184/2002
+                Prazo legal de 30 dias após formalização / aceite — Lei 14.184/2002
               </div>
               <div className="bg-slate-950/60 p-2 rounded border border-slate-800 text-slate-400">
                 <strong className="text-slate-300 block">AIA / Supressão (Análise)</strong>
-                Prazo de 180 dias de análise técnica — Decreto 47.749/2019
+                Prazo de 180 dias após formalização / aceite — Decreto 47.749/2019
               </div>
               <div className="bg-slate-950/60 p-2 rounded border border-slate-800 text-slate-400">
                 <strong className="text-slate-300 block">Triagem & DCMG</strong>
-                Triagem em 5d · DCMG (atenção 60d / crítico 90d)
+                Triagem em 5d úteis da Entrada · DCMG (atenção 60d)
               </div>
             </div>
 
@@ -293,7 +293,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                         <strong className="text-white font-mono">{p.seiNumber}</strong>
                         <span className="text-slate-400">{p.requerente}</span>
                       </div>
-                      <p className="text-slate-400 text-[10px]">Entrada há {diffDias(p.dataEntrada)} dias — prazo legal para conclusão da DCF/SD (30 dias) vencido.</p>
+                      <p className="text-slate-400 text-[10px]">Formalizado há {p.dataFormalizacao ? diffDias(p.dataFormalizacao) : 0} dias (Entrada em {p.dataEntrada}) — prazo legal para conclusão da DCF/SD (30 dias) vencido.</p>
                     </div>
                     <button onClick={() => onNavigate(p.type === 'DCF' ? 'DCF' : 'Simples Declaração', p.id)}
                       className="bg-slate-800 hover:bg-slate-700 text-white text-[10px] px-2.5 py-1 rounded border border-slate-700 transition shrink-0 ml-3 cursor-pointer">
@@ -310,7 +310,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                         <strong className="text-white font-mono">{p.seiNumber}</strong>
                         <span className="text-slate-400">{p.requerente}</span>
                       </div>
-                      <p className="text-slate-400 text-[10px]">Entrada há {diffDias(p.dataEntrada)} dias — prazo legal para análise da AIA (180 dias) vencido.</p>
+                      <p className="text-slate-400 text-[10px]">Formalizado há {p.dataFormalizacao ? diffDias(p.dataFormalizacao) : 0} dias (Entrada em {p.dataEntrada}) — prazo legal para análise da AIA (180 dias) vencido.</p>
                     </div>
                     <button onClick={() => onNavigate('AIA — Intervenção Ambiental', p.id)}
                       className="bg-slate-800 hover:bg-slate-700 text-white text-[10px] px-2.5 py-1 rounded border border-slate-700 transition shrink-0 ml-3 cursor-pointer">

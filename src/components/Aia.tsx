@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { ChecklistItem } from '../types';
-import { FileText, RefreshCw, Save, Trash2, PlusCircle, Clock, AlertCircle, CheckCircle2, ChevronDown, ChevronUp, Activity } from 'lucide-react';
+import { FileText, RefreshCw, Save, Trash2, PlusCircle, Clock, AlertCircle, CheckCircle2, ChevronDown, ChevronUp, Activity, Calendar } from 'lucide-react';
 
 interface AiaProps {
   activeProcessId: string | null;
@@ -75,6 +75,7 @@ export const Aia: React.FC<AiaProps> = ({ activeProcessId, onNavigate }) => {
   const [checklist, setChecklist] = useState<ChecklistItem[]>([]);
   const [responsavelTecnico, setResponsavelTecnico] = useState('');
   const [contagemDCMG, setContagemDCMG] = useState(0);
+  const [dataFormalizacao, setDataFormalizacao] = useState('');
   const [feedbackMsg, setFeedbackMsg] = useState('');
   const [collapsed, setCollapsed] = useState<Record<number, boolean>>({ 1: false, 2: false, 3: false, 4: false });
 
@@ -91,25 +92,28 @@ export const Aia: React.FC<AiaProps> = ({ activeProcessId, onNavigate }) => {
   });
 
   useEffect(() => {
-    if (process?.aiaData) {
-      const d = process.aiaData;
-      setIntervencoes(d.intervencoes || []);
-      setDocumentosColados(d.documentosColados || '');
-      setChecklist(d.checklist || []);
+    if (process) {
+      setDataFormalizacao(process.dataFormalizacao || '');
       setResponsavelTecnico(process.responsavelInterno || '');
-      setContagemDCMG(d.contagemDCMG ?? 0);
-      setFlowBools({
-        pendenciasNotificadas: d.pendenciasNotificadas ?? false,
-        despachoInstrucaoCriado: d.despachoInstrucaoCriado ?? false,
-        memorandoAnalistaCriado: d.memorandoAnalistaCriado ?? false,
-        encaminhadoAnalise: d.encaminhadoAnalise ?? false,
-        analiseTecnicaConcluida: d.analiseTecnicaConcluida ?? false,
-        despachoFinalCriado: d.despachoFinalCriado ?? false,
-        encaminhadoSistemaDecisoes: d.encaminhadoSistemaDecisoes ?? false,
-        sinaflorAtualizado: d.sinaflorAtualizado ?? false,
-      });
+      if (process.aiaData) {
+        const d = process.aiaData;
+        setIntervencoes(d.intervencoes || []);
+        setDocumentosColados(d.documentosColados || '');
+        setChecklist(d.checklist || []);
+        setContagemDCMG(d.contagemDCMG ?? 0);
+        setFlowBools({
+          pendenciasNotificadas: d.pendenciasNotificadas ?? false,
+          despachoInstrucaoCriado: d.despachoInstrucaoCriado ?? false,
+          memorandoAnalistaCriado: d.memorandoAnalistaCriado ?? false,
+          encaminhadoAnalise: d.encaminhadoAnalise ?? false,
+          analiseTecnicaConcluida: d.analiseTecnicaConcluida ?? false,
+          despachoFinalCriado: d.despachoFinalCriado ?? false,
+          encaminhadoSistemaDecisoes: d.encaminhadoSistemaDecisoes ?? false,
+          sinaflorAtualizado: d.sinaflorAtualizado ?? false,
+        });
+      }
     }
-  }, [activeProcessId, process?.aiaData, process?.responsavelInterno]);
+  }, [activeProcessId, process, process?.aiaData, process?.responsavelInterno, process?.dataFormalizacao]);
 
   // LISTA (sem processo selecionado)
   if (!process) {
@@ -195,6 +199,7 @@ export const Aia: React.FC<AiaProps> = ({ activeProcessId, onNavigate }) => {
     if (!activeProcessId || !process.aiaData) return;
     updateProcess(activeProcessId, {
       responsavelInterno: responsavelTecnico,
+      dataFormalizacao,
       aiaData: {
         ...process.aiaData,
         intervencoes,
@@ -215,6 +220,7 @@ export const Aia: React.FC<AiaProps> = ({ activeProcessId, onNavigate }) => {
     setFlowBools(newBools);
     if (activeProcessId && process.aiaData) {
       updateProcess(activeProcessId, {
+        dataFormalizacao,
         aiaData: { ...process.aiaData, intervencoes, documentosColados, checklist, contagemDCMG, ...newBools }
       });
     }
@@ -224,6 +230,7 @@ export const Aia: React.FC<AiaProps> = ({ activeProcessId, onNavigate }) => {
     setContagemDCMG(val);
     if (activeProcessId && process.aiaData) {
       updateProcess(activeProcessId, {
+        dataFormalizacao,
         aiaData: { ...process.aiaData, intervencoes, documentosColados, checklist, contagemDCMG: val, ...flowBools }
       });
     }
@@ -347,6 +354,37 @@ export const Aia: React.FC<AiaProps> = ({ activeProcessId, onNavigate }) => {
             {contagemDCMG >= 90 ? '⚠ Prazo avançado — verificar andamento com técnico.' : '⚡ Atenção ao prazo de análise.'}
           </p>
         )}
+      </div>
+
+      {/* Formalização & Prazo Legal */}
+      <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center gap-4">
+        <div className="flex items-center gap-2.5">
+          <Calendar className="text-sky-400 shrink-0" size={20} />
+          <div>
+            <p className="text-xs font-bold text-sky-300 uppercase tracking-wider">Formalização / Aceite</p>
+            <p className="text-[10px] text-slate-450 mt-0.5">O prazo legal de análise (180 dias) inicia-se a partir desta data</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 md:ml-auto">
+          <input
+            type="date"
+            value={dataFormalizacao}
+            onChange={e => {
+              setDataFormalizacao(e.target.value);
+              updateProcess(process.id, { dataFormalizacao: e.target.value });
+            }}
+            className="bg-slate-950 border border-slate-850 rounded-lg px-3 py-1.5 text-white font-mono text-xs focus:outline-none focus:border-emerald-500"
+          />
+          {dataFormalizacao ? (
+            <span className="text-slate-400 text-xs font-semibold">
+              Formalizado há <span className="text-emerald-400 font-bold">{Math.ceil((Date.now() - new Date(dataFormalizacao).getTime()) / 86400000)}</span> dias
+            </span>
+          ) : (
+            <span className="text-amber-400 text-[10px] font-bold bg-amber-950/20 px-2 py-0.5 rounded border border-amber-900/30">
+              Aguardando Formalização (Triagem)
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Barra de progresso */}

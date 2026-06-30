@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { FileSpreadsheet, Save, Trash2, PlusCircle, Clock, AlertCircle, CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react';
+import { FileSpreadsheet, Save, Trash2, PlusCircle, Clock, AlertCircle, CheckCircle2, ChevronDown, ChevronUp, Calendar } from 'lucide-react';
 
 interface DcfProps {
   activeProcessId: string | null;
@@ -31,16 +31,14 @@ function FlowStep({ label, note, checked, onChange }: {
         </p>
         {note && <p className="text-[10px] text-slate-500 mt-0.5">{note}</p>}
       </div>
-      {checked && <CheckCircle2 size={13} className="text-emerald-500 shrink-0 ml-auto mt-0.5" />}
     </label>
   );
 }
 
-// Cabeçalho de fase com progresso e colapso
-function PhaseHeader({ num, label, done, total, collapsed, onToggle }: {
-  num: number; label: string; done: number; total: number; collapsed: boolean; onToggle: () => void;
+function PhaseHeader({ num, label, total, done, collapsed, onToggle }: {
+  num: number; label: string; total: number; done: number; collapsed: boolean; onToggle: () => void;
 }) {
-  const isComplete = done === total && total > 0;
+  const isComplete = done === total;
   return (
     <button onClick={onToggle} className="w-full flex items-center gap-3 text-left py-2.5 px-4 hover:bg-slate-800/20 transition">
       <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
@@ -69,39 +67,43 @@ export const Dcf: React.FC<DcfProps> = ({ activeProcessId, onNavigate }) => {
   const [flow, setFlow] = useState<Record<string, boolean>>({});
   const [produtoDeclarado, setProdutoDeclarado] = useState('');
   const [volumeDeclarado, setVolumeDeclarado] = useState(0);
+  const [dataFormalizacao, setDataFormalizacao] = useState('');
   const [feedbackMsg, setFeedbackMsg] = useState('');
   const [collapsed, setCollapsed] = useState<Record<number, boolean>>({ 1: false, 2: false, 3: false });
 
   // Sincroniza com dados salvos
   useEffect(() => {
-    if (process?.dcfData) {
-      const d = process.dcfData;
-      setFlow({
-        conferidoFormulario: d.conferidoFormulario ?? false,
-        conferidoArquivosDigitais: d.conferidoArquivosDigitais ?? false,
-        conferidoCadastroPlantio: d.conferidoCadastroPlantio ?? false,
-        conferidoDaeTaxaFlorestal: d.conferidoDaeTaxaFlorestal ?? false,
-        conferidoDaeExpediente: d.conferidoDaeExpediente ?? false,
-        conferidoComprovantes: d.conferidoComprovantes ?? false,
-        conferidoTermoCiencia: d.conferidoTermoCiencia ?? false,
-        conferidoPlanilhaColheita: d.conferidoPlanilhaColheita ?? false,
-        correspondeTaxaVolume: d.correspondeTaxaVolume ?? false,
-        termoConcordanciaOutroProprietario: d.termoConcordanciaOutroProprietario ?? false,
-        daeAnoAnterior: d.daeAnoAnterior ?? false,
-        pagamentoSiteFazendaConfirmado: d.pagamentoSiteFazendaConfirmado ?? false,
-        despachoAceiteCriado: d.despachoAceiteCriado ?? false,
-        memorandoDistribuicaoCriado: d.memorandoDistribuicaoCriado ?? false,
-        encaminhadoAflobio: d.encaminhadoAflobio ?? false,
-        emAcompEspecialDCFs: d.emAcompEspecialDCFs ?? false,
-        processoConcluidoNAR: d.processoConcluidoNAR ?? false,
-        saldoSiamLancado: d.saldoSiamLancado ?? false,
-        despachoAvaliacaoCriado: d.despachoAvaliacaoCriado ?? false,
-        intimacaoEletronicaCriada: d.intimacaoEletronicaCriada ?? false,
-      });
-      setProdutoDeclarado(d.produtoDeclarado || '');
-      setVolumeDeclarado(d.volumeDeclarado || 0);
+    if (process) {
+      setDataFormalizacao(process.dataFormalizacao || '');
+      if (process.dcfData) {
+        const d = process.dcfData;
+        setFlow({
+          conferidoFormulario: d.conferidoFormulario ?? false,
+          conferidoArquivosDigitais: d.conferidoArquivosDigitais ?? false,
+          conferidoCadastroPlantio: d.conferidoCadastroPlantio ?? false,
+          conferidoDaeTaxaFlorestal: d.conferidoDaeTaxaFlorestal ?? false,
+          conferidoDaeExpediente: d.conferidoDaeExpediente ?? false,
+          conferidoComprovantes: d.conferidoComprovantes ?? false,
+          conferidoTermoCiencia: d.conferidoTermoCiencia ?? false,
+          conferidoPlanilhaColheita: d.conferidoPlanilhaColheita ?? false,
+          correspondeTaxaVolume: d.correspondeTaxaVolume ?? false,
+          termoConcordanciaOutroProprietario: d.termoConcordanciaOutroProprietario ?? false,
+          daeAnoAnterior: d.daeAnoAnterior ?? false,
+          pagamentoSiteFazendaConfirmado: d.pagamentoSiteFazendaConfirmado ?? false,
+          despachoAceiteCriado: d.despachoAceiteCriado ?? false,
+          memorandoDistribuicaoCriado: d.memorandoDistribuicaoCriado ?? false,
+          encaminhadoAflobio: d.encaminhadoAflobio ?? false,
+          emAcompEspecialDCFs: d.emAcompEspecialDCFs ?? false,
+          processoConcluidoNAR: d.processoConcluidoNAR ?? false,
+          saldoSiamLancado: d.saldoSiamLancado ?? false,
+          despachoAvaliacaoCriado: d.despachoAvaliacaoCriado ?? false,
+          intimacaoEletronicaCriada: d.intimacaoEletronicaCriada ?? false,
+        });
+        setProdutoDeclarado(d.produtoDeclarado || '');
+        setVolumeDeclarado(d.volumeDeclarado || 0);
+      }
     }
-  }, [activeProcessId, process?.dcfData]);
+  }, [activeProcessId, process, process?.dcfData, process?.dataFormalizacao]);
 
   // TELA DE LISTA (quando nenhum processo selecionado)
   if (!process) {
@@ -250,6 +252,7 @@ export const Dcf: React.FC<DcfProps> = ({ activeProcessId, onNavigate }) => {
     setFlow(newFlow);
     if (activeProcessId && process.dcfData) {
       updateProcess(activeProcessId, {
+        dataFormalizacao,
         dcfData: {
           ...process.dcfData,
           ...newFlow,
@@ -272,6 +275,7 @@ export const Dcf: React.FC<DcfProps> = ({ activeProcessId, onNavigate }) => {
   const handleSave = () => {
     if (!activeProcessId || !process.dcfData) return;
     updateProcess(activeProcessId, {
+      dataFormalizacao,
       dcfData: {
         ...process.dcfData,
         ...flow,
@@ -323,6 +327,37 @@ export const Dcf: React.FC<DcfProps> = ({ activeProcessId, onNavigate }) => {
             className="bg-red-950/20 hover:bg-red-900/40 text-red-400 border border-red-800/30 text-xs px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition cursor-pointer">
             <Trash2 size={14} />
           </button>
+        </div>
+      </div>
+
+      {/* Formalização & Prazo Legal */}
+      <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center gap-4">
+        <div className="flex items-center gap-2.5">
+          <Calendar className="text-sky-400 shrink-0" size={20} />
+          <div>
+            <p className="text-xs font-bold text-sky-300 uppercase tracking-wider">Formalização / Aceite</p>
+            <p className="text-[10px] text-slate-450 mt-0.5">O prazo legal de análise (30 dias) inicia-se a partir desta data</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 md:ml-auto">
+          <input
+            type="date"
+            value={dataFormalizacao}
+            onChange={e => {
+              setDataFormalizacao(e.target.value);
+              updateProcess(process.id, { dataFormalizacao: e.target.value });
+            }}
+            className="bg-slate-950 border border-slate-850 rounded-lg px-3 py-1.5 text-white font-mono text-xs focus:outline-none focus:border-emerald-500"
+          />
+          {dataFormalizacao ? (
+            <span className="text-slate-400 text-xs font-semibold">
+              Formalizado há <span className="text-emerald-400 font-bold">{Math.ceil((Date.now() - new Date(dataFormalizacao).getTime()) / 86400000)}</span> dias
+            </span>
+          ) : (
+            <span className="text-amber-400 text-[10px] font-bold bg-amber-950/20 px-2 py-0.5 rounded border border-amber-900/30">
+              Aguardando Formalização (Triagem)
+            </span>
+          )}
         </div>
       </div>
 
