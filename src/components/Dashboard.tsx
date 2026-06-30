@@ -199,31 +199,39 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
         const aiasContagemAlerta = processes.filter(p =>
           p.type === 'AIA' && !p.isFinalized && (p.aiaData?.contagemDCMG ?? 0) >= 60
         );
-        const processosAtrasados30 = processes.filter(p =>
+        const dcfSdAtrasados30 = processes.filter(p =>
+          (p.type === 'DCF' || p.type === 'Simples Declaração') &&
           !p.isFinalized && diffDias(p.dataEntrada) > 30
         );
-        const hasAlerts = aiasSemTriagem.length > 0 || aiasContagemAlerta.length > 0 || processosAtrasados30.length > 0;
+        const aiasAtrasadas180 = processes.filter(p =>
+          p.type === 'AIA' &&
+          !p.isFinalized && diffDias(p.dataEntrada) > 180
+        );
+        const hasAlerts = aiasSemTriagem.length > 0 || 
+                          aiasContagemAlerta.length > 0 || 
+                          dcfSdAtrasados30.length > 0 || 
+                          aiasAtrasadas180.length > 0;
 
         return (
           <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-4">
             <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
               <Scale className="text-indigo-400" size={18} />
               <h2 className="text-sm font-bold text-white">Prazos Legais</h2>
-              <span className="text-slate-500 text-xs ml-1">— Lei 14.184/2002 (processo adm. estadual MG)</span>
+              <span className="text-slate-500 text-xs ml-1">— Lei 14.184/2002 & Decreto 47.749/2019</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-[10px]">
               <div className="bg-slate-950/60 p-2 rounded border border-slate-800 text-slate-400">
-                <strong className="text-slate-300 block">Diligência (AIA/DCF)</strong>
-                30 dias para resposta — Art. 28 Lei 14.184/2002
+                <strong className="text-slate-300 block">DCF & Simples Declaração</strong>
+                Prazo legal de 30 dias para conclusão — Lei 14.184/2002
               </div>
               <div className="bg-slate-950/60 p-2 rounded border border-slate-800 text-slate-400">
-                <strong className="text-slate-300 block">Triagem inicial (AIA)</strong>
-                Até 5 dias úteis — orientação NUREG Rio Doce
+                <strong className="text-slate-300 block">AIA / Supressão (Análise)</strong>
+                Prazo de 180 dias de análise técnica — Decreto 47.749/2019
               </div>
               <div className="bg-slate-950/60 p-2 rounded border border-slate-800 text-slate-400">
-                <strong className="text-slate-300 block">Contagem DCMG</strong>
-                60d = atenção · 90d = crítico — atualizar manualmente no processo
+                <strong className="text-slate-300 block">Triagem & DCMG</strong>
+                Triagem em 5d · DCMG (atenção 60d / crítico 90d)
               </div>
             </div>
 
@@ -277,19 +285,34 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   );
                 })}
 
-                {processosAtrasados30.filter(p =>
-                  !aiasSemTriagem.some(a => a.id === p.id) && !aiasContagemAlerta.some(a => a.id === p.id)
-                ).map(p => (
+                {dcfSdAtrasados30.map(p => (
                   <div key={p.id} className="flex items-center justify-between p-2.5 bg-red-950/10 border border-red-800/20 rounded-lg text-xs">
                     <div className="space-y-0.5">
                       <div className="flex items-center gap-2">
-                        <span className="bg-red-500/20 text-red-400 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">+30 dias</span>
+                        <span className="bg-red-500/20 text-red-400 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">DCF/SD +30 dias</span>
                         <strong className="text-white font-mono">{p.seiNumber}</strong>
-                        <span className="text-slate-400">{p.type}</span>
+                        <span className="text-slate-400">{p.requerente}</span>
                       </div>
-                      <p className="text-slate-400 text-[10px]">Entrada há {diffDias(p.dataEntrada)} dias — prazo de diligência (30d) possivelmente vencido.</p>
+                      <p className="text-slate-400 text-[10px]">Entrada há {diffDias(p.dataEntrada)} dias — prazo legal para conclusão da DCF/SD (30 dias) vencido.</p>
                     </div>
-                    <button onClick={() => onNavigate(p.type === 'AIA' ? 'AIA — Intervenção Ambiental' : p.type === 'DCF' ? 'DCF' : 'Simples Declaração', p.id)}
+                    <button onClick={() => onNavigate(p.type === 'DCF' ? 'DCF' : 'Simples Declaração', p.id)}
+                      className="bg-slate-800 hover:bg-slate-700 text-white text-[10px] px-2.5 py-1 rounded border border-slate-700 transition shrink-0 ml-3 cursor-pointer">
+                      Abrir
+                    </button>
+                  </div>
+                ))}
+
+                {aiasAtrasadas180.map(p => (
+                  <div key={p.id} className="flex items-center justify-between p-2.5 bg-red-950/10 border border-red-800/20 rounded-lg text-xs">
+                    <div className="space-y-0.5">
+                      <div className="flex items-center gap-2">
+                        <span className="bg-red-500/20 text-red-400 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">AIA +180 dias</span>
+                        <strong className="text-white font-mono">{p.seiNumber}</strong>
+                        <span className="text-slate-400">{p.requerente}</span>
+                      </div>
+                      <p className="text-slate-400 text-[10px]">Entrada há {diffDias(p.dataEntrada)} dias — prazo legal para análise da AIA (180 dias) vencido.</p>
+                    </div>
+                    <button onClick={() => onNavigate('AIA — Intervenção Ambiental', p.id)}
                       className="bg-slate-800 hover:bg-slate-700 text-white text-[10px] px-2.5 py-1 rounded border border-slate-700 transition shrink-0 ml-3 cursor-pointer">
                       Abrir
                     </button>
