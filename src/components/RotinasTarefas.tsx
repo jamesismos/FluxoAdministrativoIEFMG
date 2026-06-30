@@ -1,11 +1,119 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { Clock, Calendar, Mail, FileText, Gift, Award, Copy, CheckSquare } from 'lucide-react';
+import { Clock, Calendar, Mail, FileText, Gift, Award, Copy, CheckSquare, ChevronDown, ChevronUp } from 'lucide-react';
+
+const emailTemplates = [
+  {
+    id: 'cafe',
+    titulo: 'Solicitação de Café',
+    destinatario: 'Diene (NAF)',
+    assunto: 'Solicitação de Café — IEF NAR Guanhães',
+    corpo: `Prezada Diene, bom dia.
+
+Ícaro e Paulo informaram que irão a Governador Valadares, e comuniquei a eles que faria a solicitação para trazerem os pacotes de café para o núcleo.
+
+Dessa forma, solicito, por gentileza, a disponibilização dos pacotes de café.
+
+Atenciosamente,
+James Oliveira
+IEF NAR GUANHÃES`
+  },
+  {
+    id: 'sistema_decisoes',
+    titulo: 'Encaminhar ao Sistema de Decisões',
+    destinatario: 'Sara — sara.oliveira@meioambiente.mg.gov.br',
+    assunto: 'SISTEMA DE DECISÕES',
+    corpo: `Prezada Sara,
+
+Bom dia!
+
+Gentileza encaminhar processo [NÚMERO SEI] ao sistema de decisões.
+
+Publicação Diário Executivo, [DATA], Fls [FOLHAS] ([NÚMERO DO DOCUMENTO]).
+
+Devidamente encaminhado ao NUREG RIO DOCE.
+
+Cordialmente,
+James Oliveira
+IEF NAR GUANHÃES`
+  },
+  {
+    id: 'asv_singular',
+    titulo: 'ASV para Assinatura — 1 documento',
+    destinatario: 'Camila / responsável atual',
+    assunto: 'ASV — Autorização de Uso de Veículo para Assinatura',
+    corpo: `Prezado(a),
+
+Encaminho, em anexo, o documento referente à ASV – Autorização de Uso de Veículo, para leitura e assinatura.
+
+Solicito, por gentileza, que a assinatura seja realizada por meio do gov.br e que o arquivo seja devolvido devidamente assinado.
+
+Após o retorno, o documento será arquivado na pasta compartilhada do núcleo, conforme procedimento padrão de controle e registro das ASVs.
+
+Em caso de dúvidas ou dificuldades no processo de assinatura, fico à disposição para auxiliar.
+
+Agradeço a colaboração de todos.
+
+Atenciosamente,
+James Oliveira
+Assistente Administrativo IEF/MGS`
+  },
+  {
+    id: 'asv_plural',
+    titulo: 'ASV para Assinatura — múltiplos documentos',
+    destinatario: 'Camila / responsável atual',
+    assunto: 'ASVs — Autorizações de Uso de Veículo para Assinatura',
+    corpo: `Prezado(a),
+
+Encaminho, em anexo, os documentos referentes à ASV – Autorização de Uso de Veículo, para leitura e assinatura.
+
+Solicito, por gentileza, que a assinatura seja realizada por meio do gov.br e que os arquivos sejam devolvidos devidamente assinados.
+
+Após o retorno, os documentos serão arquivados na pasta compartilhada do núcleo, conforme procedimento padrão de controle e registro das ASVs.
+
+Em caso de dúvidas ou dificuldades no processo de assinatura, fico à disposição para auxiliar.
+
+Agradeço a colaboração de todos.
+
+Atenciosamente,
+James Oliveira
+Assistente Administrativo IEF/MGS`
+  },
+  {
+    id: 'siad_problema',
+    titulo: 'Problema no SIAD — Solicitar abertura de ASV',
+    destinatario: 'Diene (NAF) — quando Camila está de férias',
+    assunto: 'Solicitação de Abertura/Fechamento de ASV — Problema no SIAD',
+    corpo: `Prezada Diene, bom dia!
+
+Devido a problemas em meu usuário do SIAD, venho por meio deste solicitar que abra e feche uma ASV para mim, por gentileza.
+
+[INFORMAR: Data, veículo (placa), motorista, horário de saída e retorno, km saída e retorno, destino]
+
+Att.,
+James Oliveira
+IEF NAR GUANHÃES`
+  },
+  {
+    id: 'conta_agua',
+    titulo: 'Envio Conta de Água',
+    destinatario: 'Samira (samira.alves@meioambiente.mg.gov.br)',
+    assunto: 'Conta de Água — IEF NAR GUANHÃES/MG',
+    corpo: `Prezada Samira,
+
+Segue em anexo conta de água IEF NAR GUANHÃES/MG VENCIMENTO [DATA DE VENCIMENTO].
+
+Gentilmente,
+James Oliveira
+Aux. Administrativo MGS/IEF`
+  }
+];
 
 export const RotinasTarefas: React.FC = () => {
   const { settings } = useApp();
+  const [expandedEmail, setExpandedEmail] = useState<string | null>(null);
 
   const iefBillingData = {
     cnpj: '18.746.164/0001-28',
@@ -119,6 +227,59 @@ export const RotinasTarefas: React.FC = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Email Templates */}
+      <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-xl space-y-4">
+        <h2 className="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-2 uppercase tracking-wider">
+          <Mail className="text-sky-400" size={16} />
+          Modelos de E-mail Rápidos
+        </h2>
+
+        <div className="space-y-2 text-xs">
+          {emailTemplates.map(tpl => (
+            <div key={tpl.id} className="bg-slate-950 border border-slate-800 rounded-lg overflow-hidden">
+              <button
+                onClick={() => setExpandedEmail(expandedEmail === tpl.id ? null : tpl.id)}
+                className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-slate-900/50 transition"
+              >
+                <div>
+                  <span className="font-bold text-white">{tpl.titulo}</span>
+                  <span className="text-slate-500 ml-2">→ {tpl.destinatario}</span>
+                </div>
+                {expandedEmail === tpl.id ? <ChevronUp size={14} className="text-slate-400 shrink-0" /> : <ChevronDown size={14} className="text-slate-400 shrink-0" />}
+              </button>
+
+              {expandedEmail === tpl.id && (
+                <div className="px-4 pb-4 space-y-3 border-t border-slate-800">
+                  <div className="mt-3 flex items-center gap-2 flex-wrap">
+                    <span className="text-slate-400">Assunto:</span>
+                    <span className="font-mono text-slate-200 bg-slate-900 px-2 py-0.5 rounded border border-slate-800 text-[11px]">{tpl.assunto}</span>
+                    <button
+                      onClick={() => handleCopyText(tpl.assunto)}
+                      className="text-slate-400 hover:text-white flex items-center gap-1 text-[10px]"
+                    >
+                      <Copy size={10} /> copiar assunto
+                    </button>
+                  </div>
+
+                  <pre className="bg-slate-900 border border-slate-800 rounded p-3 text-slate-300 text-[11px] whitespace-pre-wrap font-sans leading-relaxed">
+                    {tpl.corpo}
+                  </pre>
+
+                  <button
+                    onClick={() => handleCopyText(tpl.corpo)}
+                    className="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded text-[10px] font-semibold flex items-center gap-1.5 transition"
+                  >
+                    <Copy size={10} /> Copiar corpo do e-mail
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <p className="text-slate-600 text-[10px]">Os campos entre colchetes devem ser preenchidos antes de enviar.</p>
       </div>
     </div>
   );

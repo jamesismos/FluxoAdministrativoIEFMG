@@ -154,9 +154,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (storedProcesses) {
         const parsed = JSON.parse(storedProcesses) as Process[];
         const filtered = parsed.filter(
-          p => p.id !== 'p1' && 
-               p.id !== 'p2' && 
-               !p.requerente.toLowerCase().includes('santa rita') && 
+          p => p.id !== 'p1' &&
+               p.id !== 'p2' &&
+               !p.requerente.toLowerCase().includes('santa rita') &&
                !p.requerente.toLowerCase().includes('geraldo')
         );
         setProcesses(filtered);
@@ -210,7 +210,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Methods
   const addProcess = (type: Process['type'], details: Partial<Process>) => {
     const id = 'proc_' + Math.random().toString(36).substr(2, 9);
-    
+
     let aiaData: AiaProcessData | undefined;
     let dcfData: DcfProcessData | undefined;
     let simplesData: SimplesProcessData | undefined;
@@ -222,7 +222,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         checklist: defaultAiaChecklist(),
         pendenciasText: '',
         despachoGerado: '',
-        memorandoGerado: ''
+        memorandoGerado: '',
+        contagemDCMG: 0,
+        pendenciasNotificadas: false,
+        despachoInstrucaoCriado: false,
+        memorandoAnalistaCriado: false,
+        encaminhadoAnalise: false,
+        analiseTecnicaConcluida: false,
+        despachoFinalCriado: false,
+        encaminhadoSistemaDecisoes: false,
+        sinaflorAtualizado: false
       };
     } else if (type === 'DCF') {
       const af = settings.municipiosAflobioPecanha.includes(details.municipio || '');
@@ -263,7 +272,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     const isAflobioPecanha = type === 'DCF' && settings.municipiosAflobioPecanha.includes(details.municipio || '');
     const isNarGuanhaes = settings.municipiosGuanhaes.includes(details.municipio || '');
-    
+
     let sugAcao = details.proximaAcao || 'Realizar triagem e conferência documental';
     if (type === 'DCF' && isAflobioPecanha) {
       sugAcao = 'AFLOBIO Peçanha atende este município para DCF. Encaminhar.';
@@ -300,15 +309,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const updateProcess = (id: string, details: Partial<Process>) => {
     setProcesses(prev => prev.map(p => {
       if (p.id !== id) return p;
-      
-      // Handle automatic settings or validations on update
       const updated = { ...p, ...details };
-
-      // Ensure that if state switches to finalized, it removes from acompanhamento especial
       if (details.isFinalized === true) {
         updated.emAcompanhamentoEspecial = false;
       }
-      
       return updated;
     }));
   };
@@ -364,13 +368,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const exportData = () => {
-    const data = {
-      processes,
-      asvRecords,
-      taxaRecords,
-      normatives,
-      settings
-    };
+    const data = { processes, asvRecords, taxaRecords, normatives, settings };
     return JSON.stringify(data, null, 2);
   };
 

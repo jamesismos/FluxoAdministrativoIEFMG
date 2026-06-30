@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { Process } from '../types';
-import { PlusCircle, HelpCircle, AlertTriangle, ShieldCheck, CheckSquare } from 'lucide-react';
+import { PlusCircle, HelpCircle, AlertTriangle, ShieldCheck, CheckSquare, Info } from 'lucide-react';
 
 interface EntradaTriagemProps {
   onNavigate: (tab: string, processId?: string) => void;
@@ -21,6 +21,7 @@ export const EntradaTriagem: React.FC<EntradaTriagemProps> = ({ onNavigate }) =>
   const [situacao, setSituacao] = useState('Novo na Triagem');
   const [proximaAcao, setProximaAcao] = useState('Conferência preliminar da documentação');
   const [emAcompanhamentoEspecial, setEmAcompanhamentoEspecial] = useState(true);
+  const [faseAtual, setFaseAtual] = useState<'inicio' | 'conferencia' | 'aceite' | 'finalizacao'>('inicio');
 
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
@@ -48,6 +49,58 @@ export const EntradaTriagem: React.FC<EntradaTriagemProps> = ({ onNavigate }) =>
       finalProximaAcao = 'Conferir e emitir memorando técnico / encaminhar para vistoria se necessário';
     }
 
+    // Adjust situacao/proximaAcao based on faseAtual for processes already in progress
+    if (faseAtual === 'conferencia') {
+      finalSituacao = 'Em conferência documental';
+      finalProximaAcao = 'Concluir conferência e definir aceite ou recusa';
+    } else if (faseAtual === 'aceite') {
+      finalSituacao = 'Aceite realizado — aguardando análise técnica';
+      finalProximaAcao = 'Acompanhar análise técnica / aguardar saldo SIAM';
+    } else if (faseAtual === 'finalizacao') {
+      finalSituacao = 'Em finalização — aguardando encerramento';
+      finalProximaAcao = 'Concluir no SEI e arquivar em bloco interno';
+    }
+
+    // Build phase-aware nested data for DCF
+    const extraDetails: Partial<Process> = {};
+    if (type === 'DCF' && faseAtual !== 'inicio') {
+      const af = settings.municipiosAflobioPecanha.some(m => m.toLowerCase() === municipio.trim().toLowerCase());
+      const allChecked = faseAtual === 'aceite' || faseAtual === 'finalizacao';
+      extraDetails.dcfData = {
+        etapa: faseAtual === 'conferencia' ? 'Conferência' : faseAtual === 'aceite' ? 'Apta' : 'Finalização',
+        isApta: allChecked ? true : null,
+        municipioAflobioPecanha: af,
+        conferidoFormulario: allChecked,
+        conferidoArquivosDigitais: allChecked,
+        conferidoCadastroPlantio: allChecked,
+        conferidoDaeTaxaFlorestal: allChecked,
+        conferidoDaeExpediente: allChecked,
+        conferidoComprovantes: allChecked,
+        conferidoTermoCiencia: allChecked,
+        conferidoPlanilhaColheita: allChecked,
+        produtoDeclarado: '',
+        volumeDeclarado: 0,
+        correspondeTaxaVolume: allChecked,
+        termoConcordanciaOutroProprietario: false,
+        daeAnoAnterior: false,
+        pagamentoSiteFazendaConfirmado: allChecked,
+        despachoAceite: '',
+        memorandoTecnico: '',
+        despachoRecusa: '',
+        comunicacaoRecusa: '',
+        despachoSaldoSiam: '',
+        despachoAvaliacaoDcf: '',
+        intimacaoEletronica: ''
+      };
+    } else if (type === 'Simples Declaração' && faseAtual !== 'inicio') {
+      extraDetails.simplesData = {
+        etapa: faseAtual === 'finalizacao' ? 'Finalização' : 'Conferência',
+        conferidoDocumentos: faseAtual === 'finalizacao',
+        memorandoTecnico: '',
+        intimacaoEletronica: ''
+      };
+    }
+
     const createdId = addProcess(type, {
       seiNumber,
       municipio: municipio.trim(),
@@ -58,7 +111,8 @@ export const EntradaTriagem: React.FC<EntradaTriagemProps> = ({ onNavigate }) =>
       situacao: finalSituacao,
       proximaAcao: finalProximaAcao,
       emAcompanhamentoEspecial,
-      validacaoChefia: type === 'AIA' || type === 'DCF' ? 'Aguardando chefia' : 'Não precisa'
+      validacaoChefia: type === 'AIA' || type === 'DCF' ? 'Aguardando chefia' : 'Não precisa',
+      ...extraDetails
     });
 
     setMessage({ text: `Processo cadastrado com sucesso! ID: ${seiNumber}`, type: 'success' });
@@ -67,6 +121,7 @@ export const EntradaTriagem: React.FC<EntradaTriagemProps> = ({ onNavigate }) =>
     setSeiNumber('');
     setMunicipio('');
     setRequerente('');
+    setFaseAtual('inicio');
     
     // Auto-navigate to the detailed view after 1.5 seconds
     setTimeout(() => {
@@ -125,6 +180,29 @@ export const EntradaTriagem: React.FC<EntradaTriagemProps> = ({ onNavigate }) =>
                 </select>
               </div>
             </div>
+
+            {/* Phase selector — only for types with structured flow */}
+            {(type === 'AIA' || type === 'DCF' || type === 'Simples Declaração') && (
+              <div className="bg-slate-950/60 border border-slate-800 rounded-lg p-3 space-y-2">
+                <label className="block text-xs font-semibold text-slate-300">Em que fase o processo já está? *</label>
+                <select
+                  value={faseAtual}
+                  onChange={e => setFaseAtual(e.target.value as typeof faseAtual)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
+                >
+                  <option value="inicio">Início — processo novo, ainda na triagem</option>
+                  <option value="conferencia">Em conferência documental (já recebi, ainda conferindo)</option>
+                  {type === 'DCF' && <option value="aceite">Aceite já realizado — aguardando análise técnica</option>}
+                  <option value="finalizacao">Em finalização — aguardando encerramento no SEI</option>
+                </select>
+                {faseAtual !== 'inicio' && (
+                  <div className="flex items-start gap-2 text-amber-400 text-[11px]">
+                    <Info size={12} className="shrink-0 mt-0.5" />
+                    <span>As etapas anteriores serão marcadas automaticamente como concluídas.</span>
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>

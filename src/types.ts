@@ -15,14 +15,25 @@ export interface AiaProcessData {
   pendenciasText: string;
   despachoGerado: string;
   memorandoGerado: string;
+  // Contagem manual de dias (sistema DCMG — atualizado pelo James)
+  contagemDCMG?: number;
+  // Flow tracking
+  pendenciasNotificadas?: boolean;
+  despachoInstrucaoCriado?: boolean;
+  memorandoAnalistaCriado?: boolean;
+  encaminhadoAnalise?: boolean;
+  analiseTecnicaConcluida?: boolean;
+  despachoFinalCriado?: boolean;
+  encaminhadoSistemaDecisoes?: boolean;
+  sinaflorAtualizado?: boolean;
 }
 
 export interface DcfProcessData {
   etapa: 'Entrada' | 'Conferência' | 'Apta' | 'Recusada' | 'Finalização';
   isApta: boolean | null;
   municipioAflobioPecanha: boolean;
-  
-  // Checklist items
+
+  // Checklist items — Fase 1: Conferência
   conferidoFormulario: boolean;
   conferidoArquivosDigitais: boolean;
   conferidoCadastroPlantio: boolean;
@@ -37,8 +48,20 @@ export interface DcfProcessData {
   termoConcordanciaOutroProprietario: boolean;
   daeAnoAnterior: boolean;
   pagamentoSiteFazendaConfirmado: boolean;
-  
-  // Outputs
+
+  // Flow tracking — Fase 2: Aceite e Instrução
+  despachoAceiteCriado?: boolean;
+  memorandoDistribuicaoCriado?: boolean;
+  encaminhadoAflobio?: boolean;
+  emAcompEspecialDCFs?: boolean;
+  processoConcluidoNAR?: boolean;
+
+  // Flow tracking — Fase 3: Finalização
+  saldoSiamLancado?: boolean;
+  despachoAvaliacaoCriado?: boolean;
+  intimacaoEletronicaCriada?: boolean;
+
+  // Legacy outputs (mantidos para compatibilidade)
   despachoAceite: string;
   memorandoTecnico: string;
   despachoRecusa: string;
@@ -53,6 +76,10 @@ export interface SimplesProcessData {
   conferidoDocumentos: boolean;
   memorandoTecnico: string;
   intimacaoEletronica: string;
+  // Flow tracking
+  memorandoAnalistaCriado?: boolean;
+  analiseTecnicaConcluida?: boolean;
+  intimacaoEletronicaCriada?: boolean;
 }
 
 export interface Process {
