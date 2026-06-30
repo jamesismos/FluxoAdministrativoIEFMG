@@ -157,7 +157,18 @@ export const EntradaTriagem: React.FC<EntradaTriagemProps> = ({ onNavigate }) =>
                 <input 
                   type="text" 
                   value={seiNumber}
-                  onChange={e => setSeiNumber(e.target.value)}
+                  onChange={e => {
+                    const val = e.target.value;
+                    setSeiNumber(val);
+                    const clean = val.trim();
+                    if (clean.startsWith('2300')) {
+                      setType('AIA');
+                    } else if (clean.startsWith('2100')) {
+                      if (type === 'AIA') {
+                        setType('DCF');
+                      }
+                    }
+                  }}
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 font-mono"
                   required
                 />

@@ -159,7 +159,53 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                !p.requerente.toLowerCase().includes('santa rita') &&
                !p.requerente.toLowerCase().includes('geraldo')
         );
-        setProcesses(filtered);
+
+        // Auto-correct incorrectly registered process types (e.g., 2100 registered as AIA)
+        const corrected = filtered.map(p => {
+          const cleanSei = p.seiNumber.trim();
+          if (cleanSei.startsWith('2100') && p.type === 'AIA') {
+            const isAf = initialMunicipalitiesAflobio.some(m => m.toLowerCase() === p.municipio.trim().toLowerCase());
+            return {
+              ...p,
+              type: 'DCF' as const,
+              dcfData: p.dcfData || {
+                etapa: 'Entrada',
+                isApta: null,
+                municipioAflobioPecanha: isAf,
+                conferidoFormulario: false,
+                conferidoArquivosDigitais: false,
+                conferidoCadastroPlantio: false,
+                conferidoDaeTaxaFlorestal: false,
+                conferidoDaeExpediente: false,
+                conferidoComprovantes: false,
+                conferidoTermoCiencia: false,
+                conferidoPlanilhaColheita: false,
+                produtoDeclarado: '',
+                volumeDeclarado: 0,
+                correspondeTaxaVolume: false,
+                termoConcordanciaOutroProprietario: false,
+                daeAnoAnterior: false,
+                pagamentoSiteFazendaConfirmado: false,
+                despachoAceite: '',
+                memorandoTecnico: '',
+                despachoRecusa: '',
+                comunicacaoRecusa: '',
+                despachoSaldoSiam: '',
+                despachoAvaliacaoDcf: '',
+                intimacaoEletronica: ''
+              }
+            };
+          }
+          if (cleanSei.startsWith('2300') && p.type === 'DCF') {
+            return {
+              ...p,
+              type: 'AIA' as const
+            };
+          }
+          return p;
+        });
+
+        setProcesses(corrected);
       } else {
         setProcesses(initialProcesses());
       }
